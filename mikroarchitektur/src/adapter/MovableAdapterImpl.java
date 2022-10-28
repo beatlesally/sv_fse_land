@@ -1,5 +1,9 @@
 package adapter;
 
+/**
+ * Implementierung des Interface MovableAdapter, in der für ein Objekt der Klasse Movable die Geschwindigkeit
+ * in KM/H umgerechnet werden.
+ */
 public class MovableAdapterImpl implements MovableAdapter{
     private Movable luxuryCar;
 
