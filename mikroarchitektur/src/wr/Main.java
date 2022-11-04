@@ -17,6 +17,8 @@ public class Main {
         DecoratorWR dcproz = new DecoratorWRprozentual(eurdollar);
         //DecoratorWR mixed = new DecoratorWRprozentual(new DecoratorWRfix(eurdollar)); //zur Darbietung dass Decorator auch verschachtelt werden könnte
 
+        //Builder
+
         try{
             //Chain of Responsibility & Template Method
             //System.out.println(eurdollar.umrechnen("EUR2WN", 10.0)); //throws Exception

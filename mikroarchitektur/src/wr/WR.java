@@ -44,4 +44,6 @@ public abstract class WR implements IUmrechnen, ChainWR {
         return this.nextChain;
     }
 
+
+
 }
