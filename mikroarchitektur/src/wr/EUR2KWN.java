@@ -1,5 +1,8 @@
 package wr;
 
+/**
+ * Diese Klasse ist für die Umrechnung von € zu Südkoreanische Won verantwortlich.
+ */
 public class EUR2KWN extends WR{
 
     @Override

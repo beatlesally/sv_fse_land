@@ -1,8 +1,9 @@
 package wr;
 
+/**
+ * Diese Klasse ist für die Umrechnung von € zu Japanische Yen verantwortlich.
+ */
 public class EUR2JPY extends WR{
-
-
 
     @Override
     public double getFaktor() {
