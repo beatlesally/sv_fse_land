@@ -1,5 +1,7 @@
 package wr;
 
+import java.util.Observer;
+
 public class Main {
     public static void main(String[] args) {
 
@@ -26,6 +28,10 @@ public class Main {
         AdapterWR adapterWR = new AdapterWR(dcfix); //with Decorator
         double[] betraege = new double[] {20.36,50.00,125.30,95.00};
         System.out.println(adapterWR.sammelumrechnen(betraege, "EUR2KWN"));
+
+        //Observer
+        Observer log = new LogObserver();
+        eurdollar.addObserver(log);
 
         try{
             //Chain of Responsibility & Template Method
