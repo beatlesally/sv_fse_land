@@ -1,7 +1,7 @@
 package wr;
 
 /**
- * Diese Klasse ist für die Umrechnung von € zu Japanische Yen verantwortlich.
+ * Diese Klasse ist für die Umrechnung von Euro zu Japanische Yen verantwortlich.
  */
 public class EUR2JPY extends WR{
 
