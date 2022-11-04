@@ -1,5 +1,9 @@
 package wr;
 
+/**
+ * Diese Klasse implementiert den abstrakten Decorator für WR.
+ * Es wird die Methode {@code umrechnen} dekoriert.
+ */
 public abstract class DecoratorWR extends WR{
 
     private WR umrechner;
