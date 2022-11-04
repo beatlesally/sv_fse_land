@@ -20,6 +20,13 @@ public class Main {
         //Builder
         WR jpykwn = new BuilderWR.Builder("JPY2KWN").withFaktor(9.6).withNextChain(eurjpy).build();
 
+        //Adapter
+        //AdapterWR adapterWR = new AdapterWR(eurdollar); //with Chain of Responsibility
+        //AdapterWR adapterWR = new AdapterWR(jpykwn); //with Builder
+        AdapterWR adapterWR = new AdapterWR(dcfix); //with Decorator
+        double[] betraege = new double[] {20.36,50.00,125.30,95.00};
+        System.out.println(adapterWR.sammelumrechnen(betraege, "EUR2KWN"));
+
         try{
             //Chain of Responsibility & Template Method
             //System.out.println(eurdollar.umrechnen("EUR2WN", 10.0)); //throws Exception
@@ -37,6 +44,8 @@ public class Main {
         } catch (ENoNextChainElement noNextChainElement) {
             System.out.println(noNextChainElement.getMessage());
         }
+
+
 
     }
 }
