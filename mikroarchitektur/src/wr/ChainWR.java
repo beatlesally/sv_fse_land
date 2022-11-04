@@ -1,8 +1,8 @@
 package wr;
 
 /**
- * Implementiert die Funktionen einer Chain. Hinzufügen eines neuen Kettenelements und das Entfernen eines Kettenelement,
- * jeweils am Ende.
+ * Implementiert die Zusatzfunktionen der Chain wie Hinzufügen eines neuen Kettenelements und das Entfernen eines Kettenelement,
+ * jeweils am Ende der Chain.
  */
 public interface ChainWR {
 
@@ -17,6 +17,10 @@ public interface ChainWR {
      */
     void removeNextWR();
 
+    /**
+     * Mit dieser Methode erhält man das nächste Kettenelement.
+     * @return gibt das nächste Kettenelement vom Typ {@code WR} zurück
+     */
     WR getNextChain();
 
 }

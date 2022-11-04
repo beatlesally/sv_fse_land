@@ -1,8 +1,12 @@
 package wr;
 
+/**
+ * Diese Klasse stellt das Grundgerüst für einen speziellen Umrechner dar.
+ */
 public abstract class WR implements IUmrechnen, ChainWR {
 
-    private WR nextChain = null;
+    private WR nextChain = null; //nächstes Kettenelement
+
     public double umrechnen(String variante, double betrag) throws ENoNextChainElement{
         if(zustaendig(variante)){
             return betrag*getFaktor(); //Betrag mit dem Umrechnungsfaktor berechnen
