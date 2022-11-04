@@ -33,12 +33,23 @@ public class EUR2DOLLAR extends WR {
     public void setNextWR(WR umrechner) {
         if(this.nextChain == null){
             this.nextChain = umrechner;
+        } else {
+            System.out.println("Next Element not on end");
         }
 
     }
 
     @Override
-    public void removeWR() {
-        this.nextChain = null;
+    public void removeNextWR() {
+        if(this.nextChain.getNextChain() == null){
+            this.nextChain = null;
+        } else {
+            System.out.println("Next Element is not on end");
+        }
+    }
+
+    @Override
+    public WR getNextChain(){
+        return this.nextChain;
     }
 }

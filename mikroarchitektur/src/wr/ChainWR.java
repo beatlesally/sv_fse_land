@@ -15,6 +15,8 @@ public interface ChainWR {
     /**
      * Umrechner am Ende der Kette wird entfernt
      */
-    void removeWR();
+    void removeNextWR();
+
+    WR getNextChain();
 
 }

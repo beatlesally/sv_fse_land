@@ -36,8 +36,13 @@ public class EUR2JPY extends WR{
     }
 
     @Override
-    public void removeWR() {
+    public void removeNextWR() {
         this.nextChain = null;
 
+    }
+
+    @Override
+    public WR getNextChain() {
+        return this.nextChain;
     }
 }
