@@ -7,7 +7,7 @@ public class Main {
         WR eurjpy = new EUR2JPY();
         WR eurkwn = new EUR2KWN();
         eurdollar.setNextWR(eurjpy);
-        //eurjpy.setNextWR(eurkwn);
+        eurjpy.setNextWR(eurkwn);
         //eurdollar.setNextWR(eurkwn);
         try{
             System.out.println(eurdollar.umrechnen("EUR2KWN", 10.0));
