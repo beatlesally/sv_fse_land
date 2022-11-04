@@ -31,7 +31,11 @@ public class Main {
 
         //Observer
         Observer log = new LogObserver();
+        Observer atom = new AtomObserver();
         eurdollar.addObserver(log);
+        jpykwn.addObserver(log);
+        eurkwn.addObserver(atom);
+        //dcproz.addObserver(log);
 
         try{
             //Chain of Responsibility & Template Method
