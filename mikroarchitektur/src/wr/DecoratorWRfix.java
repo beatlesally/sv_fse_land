@@ -8,7 +8,10 @@ public class DecoratorWRfix extends DecoratorWR{
 
     @Override
     public double umrechnen(String variante, double betrag) throws ENoNextChainElement {
-        return super.umrechnen(variante, betrag-5);
+        if(betrag > 5){
+            return super.umrechnen(variante, betrag-5);
+        }
+        return super.umrechnen(variante,betrag);
     }
 
 

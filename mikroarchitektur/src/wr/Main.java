@@ -16,6 +16,7 @@ public class Main {
 
         try{
             //System.out.println(eurdollar.umrechnen("EUR2WN", 10.0)); //throws Exception
+            System.out.println(eurdollar.umrechnen("EUR2KWN", 10.0));
             System.out.println(eurdollar.umrechnen("EUR2DOLLAR", 25.36));
             System.out.println(dcfix.umrechnen("EUR2DOLLAR", 25.36));
             System.out.println(dcproz.umrechnen("EUR2DOLLAR", 25.36));
