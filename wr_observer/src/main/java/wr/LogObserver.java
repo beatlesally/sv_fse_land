@@ -4,7 +4,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * Diese Klasse implementiert einen konkreten Observer, der die Benachrichtigung in eine Log-Text-Datei schreibt.
+ */
 public class LogObserver implements Observer {
+    /**
+     * Diese Methode wird aufgerufen, wenn ein Change am beobachten Objekt auftritt und die Observer benachrichtigt werden.
+     * @param o     the observable object.
+     * @param arg   an argument passed to the {@code notifyObservers}
+     *                 method.
+     */
     @Override
     public void update(Observable o, Object arg) {
 

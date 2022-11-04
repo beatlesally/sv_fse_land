@@ -1,7 +1,6 @@
 package wr;
 
 import java.util.Observable;
-import java.util.Observer;
 
 /**
  * Diese Klasse stellt das Grundgerüst für einen speziellen Umrechner dar.
@@ -14,11 +13,13 @@ public abstract class WR extends Observable implements IUmrechnen, ChainWR {
     public double umrechnen(String variante, double betrag) throws ENoNextChainElement{
         if(zustaendig(variante)){
             double umrechnung = betrag*getFaktor();
-            String[] settings = new String[] {""+variante, ""+betrag, ""+umrechnung}; //settings die dem Observer übergeben werden
 
-            setChanged();
-            notifyObservers(settings);
-            clearChanged();
+            //settings die für den Observer übergeben werden
+            String[] settings = new String[] {""+variante, ""+betrag, ""+umrechnung};
+
+            setChanged(); //es tritt eine Veränderung auf, "Flag" wird gesetzt
+            notifyObservers(settings); //darauf werden die Observer verständigt, die das Objekt beobachten
+            clearChanged(); //"Flag" wird gelöscht
 
             return umrechnung; //Betrag mit dem Umrechnungsfaktor berechnen
         } else {
