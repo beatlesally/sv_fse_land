@@ -1,0 +1,11 @@
+[
+{ "number":1, "name":"Win10", "manufacturer":"Microsoft"}
+,
+{ "number":2, "name":"Ubuntu", "manufacturer":"Linux"}
+,
+{ "number":3, "name":"Android", "manufacturer":"Google"}
+,
+{ "number":4, "name":"MacOS", "manufacturer":"Apple"}
+,
+{ "number":5, "name":"RedHat", "manufacturer":"GNU"}
+]
