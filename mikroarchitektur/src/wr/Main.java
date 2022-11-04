@@ -4,6 +4,11 @@ public class Main {
     public static void main(String[] args) {
 
         WR umrechner = new EUR2DOLLAR();
-        System.out.println( umrechner.umrechnen("EUR2DOLLAR", 10.0));
+        try{
+            System.out.println(umrechner.umrechnen("EUR2", 10.0));
+        } catch (ENoNextChainElement noNextChainElement) {
+            System.out.println(noNextChainElement.getMessage());
+        }
+
     }
 }
