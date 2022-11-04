@@ -12,4 +12,14 @@ public abstract class DecoratorWR extends WR{
     public double umrechnen(String variante, double betrag) throws ENoNextChainElement {
         return umrechner.umrechnen(variante, betrag);
     }
+
+    @Override
+    public double getFaktor() {
+        return umrechner.getFaktor();
+    }
+
+    @Override
+    public boolean zustaendig(String variante) {
+        return umrechner.zustaendig(variante);
+    }
 }
