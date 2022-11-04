@@ -1,6 +1,6 @@
 package wr;
 
-public class JYP2KWN extends WR{
+public class BuilderWR extends WR{
 
     public static class Builder {
 
@@ -22,30 +22,35 @@ public class JYP2KWN extends WR{
             return this;
         }
 
-        public JYP2KWN build(){
-            JYP2KWN jypkwn = new JYP2KWN();
-            jypkwn.faktor = this.faktor;
-            jypkwn.variante = this.variante;
-            jypkwn.nextChain = this.nextChain;
-
-            return jypkwn;
+        public WR build(){
+            BuilderWR wr = new BuilderWR();
+            wr.faktor = this.faktor;
+            wr.variante = this.variante;
+            wr.setNextWR(this.nextChain);
+            return wr;
         }
     }
 
     private double faktor;
     private String variante;
-    private WR nextChain;
 
-    private JYP2KWN() {}
+
+    private BuilderWR() {}
 
     @Override
     public double getFaktor() {
-        return 0;
+        return this.faktor;
     }
 
     @Override
     public boolean zustaendig(String variante) {
+        if(variante.equals(this.variante)){
+            return true;
+        }
         return false;
     }
+
+
+
 
 }

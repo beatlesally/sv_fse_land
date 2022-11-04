@@ -18,6 +18,7 @@ public class Main {
         //DecoratorWR mixed = new DecoratorWRprozentual(new DecoratorWRfix(eurdollar)); //zur Darbietung dass Decorator auch verschachtelt werden könnte
 
         //Builder
+        WR jpykwn = new BuilderWR.Builder("JPY2KWN").withFaktor(9.6).withNextChain(eurjpy).build();
 
         try{
             //Chain of Responsibility & Template Method
@@ -29,6 +30,10 @@ public class Main {
             System.out.println(dcfix.umrechnen("EUR2DOLLAR", 25.36));
             System.out.println(dcproz.umrechnen("EUR2DOLLAR", 25.36));
             //System.out.println(mixed.umrechnen("EUR2DOLLAR", 25.36)); //zur Darbietung dass Decorator auch verschachtelt werden könnte
+
+            //Builder
+            System.out.println(jpykwn.umrechnen("EUR2JPY", 20.10));
+            System.out.println(jpykwn.umrechnen("JPY2KWN", 1));
         } catch (ENoNextChainElement noNextChainElement) {
             System.out.println(noNextChainElement.getMessage());
         }
