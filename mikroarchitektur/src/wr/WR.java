@@ -2,6 +2,7 @@ package wr;
 
 /**
  * Diese Klasse stellt das Grundgerüst für einen speziellen Umrechner dar.
+ * Hier sind die Methoden, die die Unterklassen benötigen, bereits ausprogrammiert.
  */
 public abstract class WR implements IUmrechnen, ChainWR {
 
