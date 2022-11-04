@@ -1,33 +1,20 @@
 package wr;
 
-import java.util.ArrayList;
-
-public class ChainWR {
-
-    private ArrayList<WR> wr = new ArrayList<>();
+/**
+ * Implementiert die Funktionen einer Chain. Hinzufügen eines neuen Kettenelements und das Entfernen eines Kettenelement,
+ * jeweils am Ende.
+ */
+public interface ChainWR {
 
     /**
      * Einen weiteren Umrechner an der Kette anfügen.
      * @param umrechner ist der neue Umrechner, der angefügt wird
      */
-    public void addWR(WR umrechner){
-        wr.add(umrechner);
-    }
+    void setNextWR(WR umrechner);
 
     /**
      * Umrechner am Ende der Kette wird entfernt
      */
-    public void removeWR(){
-        wr.remove(wr.size()-1);
-    }
+    void removeWR();
 
-    /**
-     * Eine Kette mit fixen Umrechnern wird erstellt
-     */
-    public void makeStandardChain(){
-        //Standardchain mit einer fixen Kettenfolge
-        wr.add(new DOLLAR2POUND());
-        wr.add(new EUR2YEN());
-        wr.add(new EUR2DOLLAR());
-    }
 }

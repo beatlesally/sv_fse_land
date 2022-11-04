@@ -1,8 +1,10 @@
 package wr;
 
-public abstract class WR implements IUmrechnen{
+public abstract class WR implements IUmrechnen, ChainWR{
+
+    private WR firstChain = new EUR2DOLLAR();
     public double umrechnen(String variante, double betrag){
-        return 0.0;
+        return firstChain.umrechnen(variante, betrag); //Anstoßen der Chain; Berechnungsbeginn
     }
 
 }
