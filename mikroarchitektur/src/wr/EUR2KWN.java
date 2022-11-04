@@ -1,6 +1,6 @@
 package wr;
 
-public class EUR2DOLLAR extends WR {
+public class EUR2KWN extends WR{
 
     private WR nextChain;
 
@@ -18,12 +18,12 @@ public class EUR2DOLLAR extends WR {
 
     @Override
     public double getFaktor() {
-        return 0.978; //1 EUR = 0,978 USD
+        return 1387.48; //1 EUR = 1387,48 KWN
     }
 
     @Override
     public boolean zustaendig(String variante) {
-        if(variante.equals("EUR2DOLLAR")){
+        if(variante.equals("EUR2KWN")){
             return true;
         }
         return false;
@@ -31,10 +31,7 @@ public class EUR2DOLLAR extends WR {
 
     @Override
     public void setNextWR(WR umrechner) {
-        if(this.nextChain == null){
-            this.nextChain = umrechner;
-        }
-
+        this.nextChain = umrechner;
     }
 
     @Override
