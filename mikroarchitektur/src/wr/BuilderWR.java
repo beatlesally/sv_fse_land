@@ -4,6 +4,7 @@ package wr;
  * Diese Klasse ist der Builder für einen speziellen Umrechner.
  * Hierbei können beliebige Umrechner erstellt werden.
  */
+
 public class BuilderWR extends WR{
 
     /**

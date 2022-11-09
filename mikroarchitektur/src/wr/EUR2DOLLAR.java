@@ -3,6 +3,7 @@ package wr;
 /**
  * Diese Klasse ist für die Umrechnung von Euro zu Dollar verantwortlich.
  */
+
 public class EUR2DOLLAR extends WR {
 
     @Override

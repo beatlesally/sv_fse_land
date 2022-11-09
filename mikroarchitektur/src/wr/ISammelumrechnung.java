@@ -3,6 +3,8 @@ package wr;
 /**
  * Dieses Interface ist für Sammelumrechnungen zuständig.
  */
+
+//SOLID erfüllt
 public interface ISammelumrechnung {
     /**
      * Die Methode ist für die Sammelumrechnung zuständig.

@@ -4,6 +4,8 @@ package wr;
  * Diese Klasse ist der Adapter, der die Verwendung von einer Sammelumrechnung
  * in Verbindung von IUmrechnen ermöglicht.
  */
+
+//SOLID erfüllt
 public class AdapterWR implements ISammelumrechnung{
 
     private WR umrechner;
