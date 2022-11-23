@@ -8,6 +8,7 @@ Inhaltsverzeichnis
     * [Verbindung herstellen](#datenbankverbindung-herstellen)
     * [Daten abfragen](#daten-abfragen)
     * [Daten einfügen](#daten-einfügen)
+    * [Daten aktualisieren](#daten-aktualisieren)
 
 
 ## JDBC Intro 1
@@ -67,6 +68,8 @@ Im Java Projekt werden für einen Verbindungaufbau zu einer SQl DB folgenden Par
 
         SQL Verbindungen und Abfragen müssen in einem try-catch sein, da es immer zu SQLExceptions kommen kann (z.B. falscher Benutzername, nicht existente DB/Tabelle, etc.)
 
+        wenn Connection Objekt in try-Parameter erzeugt wird, wird die Verbindung automatisch geschlossen, sobald der try-Block zu Ende ist
+
 Minimale Anforderungen für eine Datenbankverbindung mit Java (mit My-Sql-Connector-J Dependency)
 ```java
 String connectionUrl = "jdbc:mysql://localhost:3306/jdbcdemo";
@@ -104,8 +107,51 @@ while(rs.next()) //Zeiger; solange ResultSet next hat, next ist 1 Datensatz!
 }
 ```
 
-### Daten einfügen
+### Daten einfügen und aktualisieren
+Nach Herstellung der Verbindung können Daten eingefügt werden. Nötig dafür:
 
+* Variable vom Typ `PreparedStatement`: dort wird die Abfrage vorbereitet; am `Connection` Objekt wird mit `prepareStatement(sqlstatement)` die SQL Abfrage als String als Parameter übergeben; Datenwerte werden beim INSERT mit ? ersetzt
+    * so wird das Statement bereits vorbereitet und kompiliert. Es werden damit SQL-Injections vermieden, weil SQL-Statements wo eigentlich Daten sein sollten, nicht ausgeführt werden. Mit `setString(stelle,wert)` werden an den ? die Daten nachträglich eingetragen.
+* `executeUpdate()`: Statement wird ausgeführt; gibt die Anzahl der betroffenen Reihen zurück
+
+
+
+```java
+//separater try-catch-Block optional
+
+//---- Insert Demo ----------------------------------------------
+
+PreparedStatement preparedStatement = conn.prepareStatement("INSERT INTO `student` (`id`, `name`, `email`) VALUES (NULL, ?, ?)"); //INSERT
+
+try
+{
+    preparedStatement.setString(1, "Peter Zeck"); //Datenwerte eintragen bei ?
+    preparedStatement.setString(2, "p.zeck@gmail.com");
+    int rowAffected= preparedStatement.executeUpdate();
+    System.out.println("Rows affected: "+rowAffected);
+} catch (SQLException e)
+{
+    System.out.println("Fehler beim SQL-Statement: "+e.getMessage());
+}
+
+
+
+//---- Update Demo ----------------------------------------------
+
+PreparedStatement preparedStatement = conn.prepareStatement("UPDATE `student` SET `name` = ? WHERE `student`.`id`=7"); //UPDATE
+
+try
+{
+    preparedStatement.setString(1,"Hans Zimmer");
+    int rowAffected= preparedStatement.executeUpdate();
+    System.out.println("Rows affected: "+rowAffected);
+} catch (SQLException e)
+{
+    System.out.println("Fehler beim SQL-UPDATE-Statement: "+e.getMessage());
+}
+```
+
+### Daten löschen
 
 ## Usage & formatting
 
