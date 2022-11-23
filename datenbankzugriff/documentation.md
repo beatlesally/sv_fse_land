@@ -55,7 +55,7 @@ In der `pom.xml` wird eine neue Dependency eingefügt, um den Datenbankzugriff m
 
 ### Datenbankverbindung herstellen
 
-In `http://localhost/phpmyadmin/` eine neue Datenbank anlegen und in dieser Datenbank eine Tabelle (student: id, name, email) erzeugen. Es werden zwei Datensätze angelegt und das SQL Skript, das erzeugt wird, zwischengespeichert.
+In `http://localhost/phpmyadmin/` eine neue Datenbank anlegen und in dieser Datenbank eine Tabelle (student: id, name, email) erzeugen. Es werden zwei Datensätze angelegt und das SQL Skript, das erzeugt wird, zwischengespeichert (als Kommentar in Main).
 
 
 ## Usage & formatting
