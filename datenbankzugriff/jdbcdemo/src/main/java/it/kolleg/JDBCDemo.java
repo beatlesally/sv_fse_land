@@ -13,8 +13,40 @@ public class JDBCDemo {
         insertStudentDemo("Neuer Name", "new@email.com");
         deleteStudentDemo(8);
         selectAllDemo();
+        findAllByNameLike("neu");
     }
 
+    public static void findAllByNameLike(String student_name){
+        System.out.println("Find All by Name Demo with JDBC");
+
+        String connectionUrl = "jdbc:mysql://localhost:3306/jdbcdemo"; //Über welche URL + DB soll zugegriffen werden
+        String user = "root";
+        String pwd = "";
+
+        try(Connection conn = DriverManager.getConnection(connectionUrl, user, pwd))
+        {
+            System.out.println("Verbindung zur DB erfolgreich");
+
+            PreparedStatement preparedStatement = conn.prepareStatement("SELECT * FROM `student` WHERE `student`.`name` LIKE ?"); //SQL Statement vorbereiten
+            preparedStatement.setString(1,"%"+student_name.toLowerCase()+"%");
+            ResultSet rs = preparedStatement.executeQuery(); //Abfrage ausführen und Ergebnis-Objekt speichern
+
+            while(rs.next()) //solange ResultSet next hat, next ist 1 Datensatz!
+            { //Datensatz: id, name, email
+
+                //welche Spalten will man angreifen?
+                int id = rs.getInt("id"); //von der Spalte id den Inhalt in int umwandeln und speichern
+                String name = rs.getString("name");
+                String email = rs.getString("email");
+
+                System.out.println("Student: [id] "+id+" [name] "+name+" [email] "+email);
+            }
+
+        } catch (SQLException e)
+        {
+            System.out.println("Fehler beim Aufbau zur Verbindung zur DB: "+ e.getMessage());
+        }
+    }
 
     public static void deleteStudentDemo(int student_id){
         System.out.println("delete Demo with JDBC");

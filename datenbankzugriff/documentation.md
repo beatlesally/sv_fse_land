@@ -7,8 +7,7 @@ Inhaltsverzeichnis
     * [Umgebung einrichten](#umgebung-einrichten)
     * [Verbindung herstellen](#datenbankverbindung-herstellen)
     * [Daten abfragen](#daten-abfragen)
-    * [Daten einfügen](#daten-einfügen)
-    * [Daten aktualisieren](#daten-aktualisieren)
+    * [Daten einfügen, aktualisieren, löschen](#daten-einfügen-aktualisieren-und-löschen)
 
 
 ## JDBC Intro 1
@@ -107,11 +106,11 @@ while(rs.next()) //Zeiger; solange ResultSet next hat, next ist 1 Datensatz!
 }
 ```
 
-### Daten einfügen und aktualisieren
-Nach Herstellung der Verbindung können Daten eingefügt werden. Nötig dafür:
+### Daten einfügen, aktualisieren und löschen
+Nach Herstellung der Verbindung verändert Daten eingefügt werden. Nötig dafür:
 
 * Variable vom Typ `PreparedStatement`: dort wird die Abfrage vorbereitet; am `Connection` Objekt wird mit `prepareStatement(sqlstatement)` die SQL Abfrage als String als Parameter übergeben; Datenwerte werden beim INSERT mit ? ersetzt
-    * so wird das Statement bereits vorbereitet und kompiliert. Es werden damit SQL-Injections vermieden, weil SQL-Statements wo eigentlich Daten sein sollten, nicht ausgeführt werden. Mit `setString(stelle,wert)` werden an den ? die Daten nachträglich eingetragen.
+    * so wird das Statement bereits vorbereitet und kompiliert. Es werden damit SQL-Injections vermieden, weil SQL-Statements wo eigentlich Daten sein sollten, nicht ausgeführt werden, wenn hardcodiert. Mit `setString(stelle,wert)` werden an den ? die Daten nachträglich eingetragen.
 * `executeUpdate()`: Statement wird ausgeführt; gibt die Anzahl der betroffenen Reihen zurück
 
 
@@ -149,21 +148,20 @@ try
 {
     System.out.println("Fehler beim SQL-UPDATE-Statement: "+e.getMessage());
 }
+
+
+//---- Delete Demo ----------------------------------------------
+
+PreparedStatement preparedStatement = conn.prepareStatement("DELETE FROM `student` WHERE `student`.`id` = ?"); //SQL Statement vorbereiten
+
+try
+{
+    preparedStatement.setInt(1,student_id);
+    int rowAffected= preparedStatement.executeUpdate();
+    System.out.println("Rows affected: "+rowAffected);
+} catch (SQLException e)
+{
+    System.out.println("Fehler beim SQL-DELETE-Statement: "+e.getMessage());
+}
 ```
-
-### Daten löschen
-
-## Usage & formatting
-
-This Readme template is written using Markdown. See [GitHub's instructions on writing in Markdown](https://help.github.com/articles/basic-writing-and-formatting-syntax/) if you aren't familiar.
-
-Usage:
-
-1. In your repository, create a new file and name it `README.md`.
-2. Copy and paste the below template in your README.md
-3. Edit the text as needed for your project
-
-**Note** Text in `*italics*` (as under `Getting started`) indicates template instructions that should be replaced with text specific to the project. Regular text (as under `Errors and bugs`) indicates a standard block of text that you can copy/paste directly.
-
-## The template
 
