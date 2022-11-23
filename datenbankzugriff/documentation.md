@@ -33,6 +33,9 @@ Apache und MySQL über das XAMPP Control Panel starten.
     http://localhost/phpmyadmin/
     bei abweichenden Apache Port (80,443) URL anpassen
 
+Dort können auch SQL Statements auf ihre Richtigkeit geprüft werden.
+![SQL](../../../../../../C:/school/5AAIF/FSE_LAND/sv_fse_land/datenbankzugriff/pics/Screenshot%202022-11-23%20105444.png)
+
 Als nächstes wird mit IntelliJ ein neues Maven Projekt erstellt. Hierfür ist eine funktionierende Maven-Installation notwendig.
 
     Die Installation und den Download von MAVEN findet man hier:
