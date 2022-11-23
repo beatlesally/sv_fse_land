@@ -5,6 +5,9 @@ In dieser Mitschrift werden die Schritte der Videos aufgelistet und beschrieben.
 Inhaltsverzeichnis
 * [JDBC Intro 1](#jdbc-intro-1)
     * [Umgebung einrichten](#umgebung-einrichten)
+    * [Verbindung herstellen](#datenbankverbindung-herstellen)
+    * [Daten abfragen](#daten-abfragen)
+    * [Daten einfügen](#daten-einfügen)
 
 
 ## JDBC Intro 1
@@ -56,6 +59,52 @@ In der `pom.xml` wird eine neue Dependency eingefügt, um den Datenbankzugriff m
 ### Datenbankverbindung herstellen
 
 In `http://localhost/phpmyadmin/` eine neue Datenbank anlegen und in dieser Datenbank eine Tabelle (student: id, name, email) erzeugen. Es werden zwei Datensätze angelegt und das SQL Skript, das erzeugt wird, zwischengespeichert (als Kommentar in Main).
+
+Im Java Projekt werden für einen Verbindungaufbau zu einer SQl DB folgenden Parameter benötigt:
+* Benutzername
+* Passwort
+* Connection URL
+
+        SQL Verbindungen und Abfragen müssen in einem try-catch sein, da es immer zu SQLExceptions kommen kann (z.B. falscher Benutzername, nicht existente DB/Tabelle, etc.)
+
+Minimale Anforderungen für eine Datenbankverbindung mit Java (mit My-Sql-Connector-J Dependency)
+```java
+String connectionUrl = "jdbc:mysql://localhost:3306/jdbcdemo";
+String user = "root";
+String pwd = "";
+
+try(Connection conn = DriverManager.getConnection(connectionUrl, user, pwd))
+{
+    System.out.println("Verbindung zur DB erfolgreich");
+} catch (SQLException e)
+{
+    System.out.println("Fehler beim Aufbau zur Verbindung zur DB: "+ e.getMessage());
+}
+```
+
+### Daten abfragen
+Nach dem Herstellen der Verbindung können Daten abgefragt werden. 
+Nötig dafür:
+* Variable vom Typ `PreparedStatement`: dort wird die Abfrage vorbereitet; am `Connection` Objekt wird mit `prepareStatement(sqlstatement)` die SQL Abfrage als String als Parameter übergeben
+* Variable vom Typ `ResultSet`: dort wird das Ergebnis der Abfrage gespeichert; an der `PreparedStatement` Variable wird `executeQuery()` aufgerufen, um die Abfrage aufzuführen
+* while-Schleife um `ResultSet` mit Zeiger mit `next()` zu durchlaufen: Zeiger zeigt auf einen Datensatz (z.B. id, name, email); in der Schleife wird auf die Spalten und deren Daten des Datensatzes zugegriffen
+
+```java
+PreparedStatement preparedStatement = conn.prepareStatement("SELECT * FROM `student`"); //SQL Statement vorbereiten
+ResultSet rs = preparedStatement.executeQuery(); //Abfrage ausführen und Ergebnis-Objekt speichern
+
+while(rs.next()) //Zeiger; solange ResultSet next hat, next ist 1 Datensatz!
+{ //Datensatz: id, name, email
+
+    int id = rs.getInt("id"); //von der Spalte id den Inhalt in int umwandeln und speichern
+    String name = rs.getString("name");
+    String email = rs.getString("email");
+
+    System.out.println("Student: [id] "+id+" [name] "+name+" [email] "+email);
+}
+```
+
+### Daten einfügen
 
 
 ## Usage & formatting
