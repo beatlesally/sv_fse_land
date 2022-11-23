@@ -22,9 +22,13 @@ public class JDBCDemoExtention {
             System.out.println("Verbindung zu DB erfolgreich");
             selectAll(conn);
             findByKursBezLike(conn, "s");
-            update();
-            insert();
-            delete();
+            update(conn, "1", "FSE_Advanced");
+            selectAll(conn);
+            insert(conn);
+            selectAll(conn);
+            delete(conn);
+            selectAll(conn);
+
         } catch (SQLException e){
             System.out.println("Fehler bei DB Verbindung: "+e.getMessage());
         }
@@ -66,19 +70,31 @@ public class JDBCDemoExtention {
             }
 
         } catch (SQLException e) {
-            System.out.println("Fehler bei SQL-SELECT-Statement: "+e.getMessage());;
+            System.out.println("Fehler bei SQL-SELECTLIKE-Statement: "+e.getMessage());;
         }
     }
 
-    public static void update(){
+    public static void update(Connection conn, String kursnr, String kursbz){
+        System.out.println("------ UPDATE -------------------------");
+        try {
+            PreparedStatement preparedStatement = conn.prepareStatement("UPDATE `kurs` SET `kursbezeichnung` = ? WHERE `kurs`.`kursnummer`=?");
+            preparedStatement.setString(1,kursbz);
+            preparedStatement.setString(2,kursnr);
 
+            int rowsAffected = preparedStatement.executeUpdate();
+            System.out.println("Datensätze geändert: "+rowsAffected);
+        } catch (SQLException e) {
+            System.out.println("Fehler bei SQL-UPDATE-Statement: "+e.getMessage());;
+        }
     }
 
-    public static void insert(){
+    public static void insert(Connection conn){
+        System.out.println("------ INSERT -------------------------");
     //INSERT INTO `kurs` (`kursnummer`, `kursbezeichnung`, `raumnummer`) VALUES (NULL, 'FSE', '25636'), (NULL, 'POS', '66954');
     }
 
-    public static void delete(){
+    public static void delete(Connection conn){
+        System.out.println("------ DELETE -------------------------");
 
     }
 }
