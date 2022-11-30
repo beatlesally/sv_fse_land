@@ -1,6 +1,8 @@
 package it.kolleg;
 
 import it.kolleg.dataaccess.MySQLDBConnection;
+import it.kolleg.dataaccess.MySQLDBException;
+import it.kolleg.dataaccess.MySqlCourseRepository;
 import it.kolleg.ui.CLI;
 
 import java.sql.Connection;
@@ -15,16 +17,15 @@ public class Main
     public static void main( String[] args )
     {
 
-        CLI mycli = new CLI();
-        mycli.start();
-
+        CLI mycli = null;
         try {
-            Connection connection = MySQLDBConnection.getConn("jdbc:mysql://localhost:3306/kurssystem", "root", "");
-            System.out.println("Verbindung check!");
-        } catch (ClassNotFoundException e) {
-            System.out.println("Klasse nicht gefunden: "+e.getMessage());;
+            mycli = new CLI(new MySqlCourseRepository());
+            mycli.start();
         } catch (SQLException e) {
-            System.out.println("Fehler beim Verbindungsaufbau: "+e.getMessage());
+            System.out.println("DB-Fehler: "+e.getSQLState()+" \n"+e.getMessage());
+        } catch (ClassNotFoundException e) {
+            System.out.println("Sonstiger Fehler: "+e.getMessage());
         }
+
     }
 }
