@@ -11,8 +11,26 @@ public class Course extends BaseEntity {
     private Date endDate;
     private CourseType courseType;
 
-    public Course(Long id) {
+    //für ... Statements
+    public Course(Long id, String name, String descr, int hours, Date beginDate, Date endDate, CourseType courseType) throws InvalidValueException{
         super(id);
+        this.setName(name);
+        this.setDescr(descr);
+        this.setHours(hours);
+        this.setBeginDate(beginDate);
+        this.setEndDate(endDate);
+        this.setCourseType(courseType);
+    }
+
+    // für ... Statements
+    public Course(String name, String descr, int hours, Date beginDate, Date endDate, CourseType courseType) throws InvalidValueException{
+        super(null);
+        this.setName(name);
+        this.setDescr(descr);
+        this.setHours(hours);
+        this.setBeginDate(beginDate);
+        this.setEndDate(endDate);
+        this.setCourseType(courseType);
     }
 
     public String getName() {

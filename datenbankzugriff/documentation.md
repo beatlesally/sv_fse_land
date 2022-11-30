@@ -194,12 +194,6 @@ try
 ## JDBC Intro 2
 In diesem zweiten Teil werden zwei neue Pattern behandelt:
 
-### DAO (Data Access Object)
-> "...ist ein Entwurfsmuster, das den Zugriff auf unterschiedliche Arten von Datenquellen (z. B. Datenbanken, Dateisystem) so kapselt, dass die angesprochene Datenquelle ausgetauscht werden kann, ohne dass der aufrufende Code geändert werden muss."
->  https://de.wikipedia.org/wiki/Data_Access_Object
-* 
-
-
 ### Singleton
 > "Es stellt sicher, dass von einer Klasse genau ein Objekt existiert."
 > https://de.wikipedia.org/wiki/Singleton_(Entwurfsmuster)
@@ -222,3 +216,19 @@ public static Connection getConn(String url, String user, String pwd) throws Cla
   }
 }
 ```
+
+### DAO (Data Access Object)
+> "...ist ein Entwurfsmuster, das den Zugriff auf unterschiedliche Arten von Datenquellen (z. B. Datenbanken, Dateisystem) so kapselt, dass die angesprochene Datenquelle ausgetauscht werden kann, ohne dass der aufrufende Code geändert werden muss."
+>  https://de.wikipedia.org/wiki/Data_Access_Object
+* Daten aus einer DB werden so aufgearbeitet, dass sie als Objekt verfügbar sind; somit ist damit als Programmierer leichter zu arbeiten als mit einem Datensatz
+
+* für jede Entity und den Zugriff wird das Interface ausimplementiert
+
+
+![Alt text](../../../../../../C:/school/5AAIF/FSE_LAND/sv_fse_land/datenbankzugriff/pics/dao.jpg) http://best-practice-software-engineering.ifs.tuwien.ac.at/patterns/dao.html
+
+
+
+Im Beispiel werden die Pattern für folgendes verwendet:
+* Singleton: Zugriff auf die Quelle (Verbindung soll nur einmal hergestellt werden)
+* DAO: Datensätze werden als Objekte aufbereitet
