@@ -8,6 +8,7 @@ Inhaltsverzeichnis
     * [Verbindung herstellen](#datenbankverbindung-herstellen)
     * [Daten abfragen](#daten-abfragen)
     * [Daten einfügen, aktualisieren, löschen](#daten-einfügen-aktualisieren-und-löschen)
+* [JDBC Intro 2](#jdbc-intro-2)
 
 
 ## JDBC Intro 1
@@ -89,12 +90,18 @@ try(Connection conn = DriverManager.getConnection(connectionUrl, user, pwd))
 
 ### Daten abfragen
 Nach dem Herstellen der Verbindung können Daten abgefragt werden. 
+* wird eine Select nach einem bestimmten Buchstaben ausgeführt, wird ein anderes SQl-Statement benötigt, sowie ein ? Platzhalter in diesem Statement; siehe [Daten einfügen, aktualisieren, löschen](#daten-einfügen-aktualisieren-und-löschen) für Erklärung
+
 Nötig dafür:
 * Variable vom Typ `PreparedStatement`: dort wird die Abfrage vorbereitet; am `Connection` Objekt wird mit `prepareStatement(sqlstatement)` die SQL Abfrage als String als Parameter übergeben
 * Variable vom Typ `ResultSet`: dort wird das Ergebnis der Abfrage gespeichert; an der `PreparedStatement` Variable wird `executeQuery()` aufgerufen, um die Abfrage aufzuführen
 * while-Schleife um `ResultSet` mit Zeiger mit `next()` zu durchlaufen: Zeiger zeigt auf einen Datensatz (z.B. id, name, email); in der Schleife wird auf die Spalten und deren Daten des Datensatzes zugegriffen
 
+
 ```java
+
+//---- Select All Demo ----------------------------------------------
+
 PreparedStatement preparedStatement = conn.prepareStatement("SELECT * FROM `student`"); //SQL Statement vorbereiten
 ResultSet rs = preparedStatement.executeQuery(); //Abfrage ausführen und Ergebnis-Objekt speichern
 
@@ -107,14 +114,30 @@ while(rs.next()) //Zeiger; solange ResultSet next hat, next ist 1 Datensatz!
 
     System.out.println("Student: [id] "+id+" [name] "+name+" [email] "+email);
 }
+
+
+//---- Select Like Demo ----------------------------------------------
+ PreparedStatement preparedStatement = conn.prepareStatement("SELECT * FROM `student` WHERE `student`.`name` LIKE ?");
+    preparedStatement.setString(1,"%"+student_name.toLowerCase()+"%");
+    ResultSet rs = preparedStatement.executeQuery(); 
+
+    while(rs.next()) 
+    { //Datensatz: id, name, email
+        int id = rs.getInt("id"); 
+        String name = rs.getString("name");
+        String email = rs.getString("email");
+
 ```
 
 ### Daten einfügen, aktualisieren und löschen
-Nach Herstellung der Verbindung verändert Daten eingefügt werden. Nötig dafür:
+Nach Herstellung der Verbindung können Daten eingefügt, verändert und gelöscht werden. 
+
+Nötig dafür:
 
 * Variable vom Typ `PreparedStatement`: dort wird die Abfrage vorbereitet; am `Connection` Objekt wird mit `prepareStatement(sqlstatement)` die SQL Abfrage als String als Parameter übergeben; Datenwerte werden beim INSERT mit ? ersetzt
-    * so wird das Statement bereits vorbereitet und kompiliert. Es werden damit SQL-Injections vermieden, weil SQL-Statements wo eigentlich Daten sein sollten, nicht ausgeführt werden, wenn hardcodiert. Mit `setString(stelle,wert)` werden an den ? die Daten nachträglich eingetragen.
+    * so wird das Statement bereits vorbereitet und kompiliert. Es werden damit SQL-Injections vermieden, weil SQL-Statements wo eigentlich Daten sein sollten, nicht ausgeführt werden, wenn hardcodiert/direkt eingefügt. Mit `setString(stelle,wert), setInt(stelle,wert), ...` werden an den ? die Daten nachträglich eingetragen; auf Datentyp achten!
 * `executeUpdate()`: Statement wird ausgeführt; gibt die Anzahl der betroffenen Reihen zurück
+* Es kann nur durch das SQL-Statement selbst zwischen Einfügen, Aktualisieren und Löschen unterschieden werden. Der Grundaufbau ist für alle gleich.
 
 
 
@@ -168,3 +191,4 @@ try
 }
 ```
 
+## JDBC Intro 2
