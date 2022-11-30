@@ -192,3 +192,12 @@ try
 ```
 
 ## JDBC Intro 2
+In diesem zweiten Teil werden zwei neue Pattern behandelt:
+
+### DAO (Data Access Object)
+>.. ist ein Entwurfsmuster, das den Zugriff auf unterschiedliche Arten von Datenquellen (z. B. Datenbanken, Dateisystem) so kapselt, dass die angesprochene Datenquelle ausgetauscht werden kann, ohne dass der aufrufende Code geändert werden muss.
+> https://de.wikipedia.org/wiki/Data_Access_Object
+* 
+
+
+### Singleton
