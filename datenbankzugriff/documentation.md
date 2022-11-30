@@ -195,9 +195,30 @@ try
 In diesem zweiten Teil werden zwei neue Pattern behandelt:
 
 ### DAO (Data Access Object)
->.. ist ein Entwurfsmuster, das den Zugriff auf unterschiedliche Arten von Datenquellen (z. B. Datenbanken, Dateisystem) so kapselt, dass die angesprochene Datenquelle ausgetauscht werden kann, ohne dass der aufrufende Code geändert werden muss.
-> https://de.wikipedia.org/wiki/Data_Access_Object
+> "...ist ein Entwurfsmuster, das den Zugriff auf unterschiedliche Arten von Datenquellen (z. B. Datenbanken, Dateisystem) so kapselt, dass die angesprochene Datenquelle ausgetauscht werden kann, ohne dass der aufrufende Code geändert werden muss."
+>  https://de.wikipedia.org/wiki/Data_Access_Object
 * 
 
 
 ### Singleton
+> "Es stellt sicher, dass von einer Klasse genau ein Objekt existiert."
+> https://de.wikipedia.org/wiki/Singleton_(Entwurfsmuster)
+* In unserem Beispiel wird nur eine Verbindung aufgebaut, die im Datenfeld gespeichert wird (also ein Connection-Objekt, das immer wieder verwendet wird). Bei jeder Erstellung von einem neuen Objekt wird überprüft, ob bereits eine Verbindung existiert und dann diese zurückgegeben.
+
+```java
+public class MySQLDBConnection {
+    private static Connection conn = null;
+
+private MySQLDBConnection(){} //Konstruktor privat, damit mit new kein Objekt erstellt werden kann; Connection Objekt muss immer von getConn bekommen werden
+
+public static Connection getConn(String url, String user, String pwd) throws ClassNotFoundException, SQLException {
+    if(conn != null){ //wenn im Datenfeld schon Objekt drinnen, wird Objekt zurückgegeben; somit nur eine Verbindung erzeugt
+        return conn;
+    } else {
+        Class.forName("com.mysql.cj.jdbc.Driver"); //throws ClassNotFoundException
+        conn = DriverManager.getConnection(url,user,pwd); //throws SQLException
+        return conn;
+    }
+  }
+}
+```

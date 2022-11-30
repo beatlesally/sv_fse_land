@@ -11,10 +11,7 @@ import java.sql.SQLException;
 public class MySQLDBConnection {
     private static Connection conn = null;
 
-    private MySQLDBConnection() //private, damit mit new kein Objekt erstellt werden kann
-    {
-
-    }
+    private MySQLDBConnection(){}//private, damit mit new kein Objekt erstellt werden kann
 
     public static Connection getConn(String url, String user, String pwd) throws ClassNotFoundException, SQLException {
         if(conn != null){ //wenn im Datenfeld schon Objekt drinnen, wird Objekt zurückgegeben; somit nur eine Verbindung erzeugt
