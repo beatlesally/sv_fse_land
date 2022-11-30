@@ -45,12 +45,11 @@ public class MySqlCourseRepository implements MyCoursesRepository{
                         CourseType.valueOf(resultSet.getString("coursetype")) //String kommt zurück aber wird brauchen enum, umwandeln
                         )
                 );
-                return courseList;
             }
+            return courseList;
         } catch (SQLException e){
             throw new MySQLDBException("Database error occured!");
         }
-        return null;
     }
 
     @Override
