@@ -21,12 +21,12 @@ public class JDBCDemoExtention {
         try(Connection conn = DriverManager.getConnection(connectionUrl, user, pwd)){
             System.out.println("Verbindung zu DB erfolgreich");
             selectAll(conn);
-            findByKursBezLike(conn, "s");
-            update(conn, "1", "FSE_Advanced");
+            findByKursBezLike(conn, "v");
+            update(conn, 1, "FSE_Advanced");
             selectAll(conn);
-            insert(conn);
+            insert(conn, "NVS", 36602);
             selectAll(conn);
-            delete(conn);
+            delete(conn, 2);
             selectAll(conn);
 
         } catch (SQLException e){
@@ -74,12 +74,12 @@ public class JDBCDemoExtention {
         }
     }
 
-    public static void update(Connection conn, String kursnr, String kursbz){
+    public static void update(Connection conn, int kursnr, String kursbz){
         System.out.println("------ UPDATE -------------------------");
         try {
             PreparedStatement preparedStatement = conn.prepareStatement("UPDATE `kurs` SET `kursbezeichnung` = ? WHERE `kurs`.`kursnummer`=?");
             preparedStatement.setString(1,kursbz);
-            preparedStatement.setString(2,kursnr);
+            preparedStatement.setInt(2,kursnr);
 
             int rowsAffected = preparedStatement.executeUpdate();
             System.out.println("Datensätze geändert: "+rowsAffected);
@@ -88,13 +88,32 @@ public class JDBCDemoExtention {
         }
     }
 
-    public static void insert(Connection conn){
+    public static void insert(Connection conn, String kursbz, int raumnr){
         System.out.println("------ INSERT -------------------------");
     //INSERT INTO `kurs` (`kursnummer`, `kursbezeichnung`, `raumnummer`) VALUES (NULL, 'FSE', '25636'), (NULL, 'POS', '66954');
+        try {
+            PreparedStatement preparedStatement = conn.prepareStatement("INSERT INTO `kurs` (`kursnummer`, `kursbezeichnung`, `raumnummer`) VALUES (NULL, ?, ?)");
+            preparedStatement.setString(1,kursbz);
+            preparedStatement.setInt(2,raumnr);
+
+            int rowsAffected = preparedStatement.executeUpdate();
+            System.out.println("Datensätze geändert: "+rowsAffected);
+        } catch (SQLException e) {
+            System.out.println("Fehler bei SQL-UPDATE-Statement: "+e.getMessage());;
+        }
     }
 
-    public static void delete(Connection conn){
+    public static void delete(Connection conn, int kursnr){
         System.out.println("------ DELETE -------------------------");
-
+        try
+        {
+            PreparedStatement preparedStatement = conn.prepareStatement("DELETE FROM `kurs` WHERE `kurs`.`kursnummer` = ?"); //SQL Statement vorbereiten
+            preparedStatement.setInt(1,kursnr);
+            int rowAffected= preparedStatement.executeUpdate();
+            System.out.println("Datensätze geändert: "+rowAffected);
+        } catch (SQLException e)
+        {
+            System.out.println("Fehler beim SQL-DELETE-Statement: "+e.getMessage());
+        }
     }
 }
