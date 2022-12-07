@@ -141,15 +141,59 @@ public class MySqlCourseRepository implements MyCoursesRepository{
      */
     @Override
     public Optional<Course> update(Course entity) {
-        return Optional.empty();
+
+        Assert.notNull(entity);
+
+        String sql = "UPDATE `courses` SET `name`=?,`description`=?,`hours`=?,`begindate`=?,`enddate`=?,`coursetype`=? WHERE `id`=?";
+
+        if(countCoursesInDBWithId(entity.getId())==0){
+            return Optional.empty();
+        } else {
+
+            try
+            {
+                PreparedStatement preparedStatement = conn.prepareStatement(sql);
+                preparedStatement.setString(1,entity.getName());
+                preparedStatement.setString(2,entity.getDescr());
+                preparedStatement.setInt(3,entity.getHours());
+                preparedStatement.setDate(4,entity.getBeginDate());
+                preparedStatement.setDate(5,entity.getEndDate());
+                preparedStatement.setString(6,entity.getCourseType().toString());
+                preparedStatement.setLong(7,entity.getId());
+
+                int affectedRows = preparedStatement.executeUpdate();
+
+                if(affectedRows == 0){
+                    return Optional.empty();
+                } else {
+                    return this.getById(entity.getId());
+                }
+            } catch (SQLException sqlException){
+                throw new MySQLDBException(sqlException.getMessage());
+            }
+        }
     }
 
     /**
      * CRUD
      */
     @Override
-    public void deleteById(Long id) {
+    public void deleteById(Long id)
+    {
+        Assert.notNull(id);
 
+        String sql = "DELETE FROM `courses` WHERE `id`=?";
+        if(countCoursesInDBWithId(id) == 1)
+        {
+            try {
+                PreparedStatement preparedStatement = conn.prepareStatement(sql);
+                preparedStatement.setLong(1,id);
+                preparedStatement.executeUpdate();
+            } catch (SQLException e) {
+                throw new MySQLDBException(e.getMessage());
+            }
+
+        }
     }
 
     @Override
@@ -164,7 +208,32 @@ public class MySqlCourseRepository implements MyCoursesRepository{
 
     @Override
     public List<Course> findAllCoursesByNameOrDescr(String searchText) {
-        return null;
+        try
+        {
+            String sql = "SELECT * FROM `courses` WHERE LOWER(`description`) LIKE LOWER(?) OR LOWER(`name`) LIKE LOWER(?)";
+            PreparedStatement preparedStatement = conn.prepareStatement(sql);
+            preparedStatement.setString(1,"%"+searchText+"%");
+            preparedStatement.setString(2,"%"+searchText+"%");
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            ArrayList<Course> courses = new ArrayList<>();
+
+            while (resultSet.next()){
+                courses.add(new Course(
+                        resultSet.getLong("id"),
+                        resultSet.getString("name"),
+                        resultSet.getString("description"),
+                        resultSet.getInt("hours"),
+                        resultSet.getDate("begindate"),
+                        resultSet.getDate("enddate"),
+                        CourseType.valueOf(resultSet.getString("coursetype")) //String kommt zurück aber wird brauchen enum, umwandeln
+                ));
+            }
+            return courses;
+
+        } catch (SQLException sqlException){
+            throw new MySQLDBException(sqlException.getMessage());
+        }
     }
 
     @Override

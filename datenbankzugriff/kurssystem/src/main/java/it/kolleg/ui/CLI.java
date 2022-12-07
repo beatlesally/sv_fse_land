@@ -7,6 +7,7 @@ import it.kolleg.domain.CourseType;
 import it.kolleg.domain.InvalidValueException;
 
 import java.sql.Date;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -43,6 +44,15 @@ public class CLI {
                 case "3":
                     showCourseDetails();
                     break;
+                case "4":
+                    updateCourseDetails();
+                    break;
+                case "5":
+                    deleteCourse();
+                    break;
+                case "6":
+                    courseSearch();
+                    break;
                 case "x":
                     System.out.println("bye bye");
                     break;
@@ -56,10 +66,12 @@ public class CLI {
 
     }
 
+
     private void showMenu()
     {
         System.out.println("------ Kursmanagement -----------------------------");
-        System.out.println("(1) Kurs eingeben \t (2) Alle Kurse anzeigen \t \t (3)Kursdetails");
+        System.out.println("(1) Kurs eingeben \t (2) Alle Kurse anzeigen \t (3)Kursdetails");
+        System.out.println("(4) Kursdetails aktualisieren \t (5)Kurs löschen \t (6)Kurssuche");
         System.out.println("(x) Ende");
     }
 
@@ -130,6 +142,84 @@ public class CLI {
         }
     }
 
+    private void updateCourseDetails() {
+        System.out.println("Für welche KursID Details ändern?");
+        Long courseID = Long.parseLong(scanner.nextLine());
+
+        try
+        {
+            Optional<Course> courseOptional = repo.getById(courseID);
+            if(courseOptional.isEmpty()){
+                System.out.println("Kurs mit ID "+courseID+" nicht gefunden");
+            } else {
+                Course course = courseOptional.get();
+                System.out.println("Änderungen für folgenden Kurs: ");
+                System.out.println(course);
+
+                String name, desc, hours, dateFrom, dateTo, courseType;
+                System.out.println("Bitte neue Kursdaten angeben (Enter falls keine Änderung gewünscht ist)");
+                System.out.println("Name: ");
+                name = scanner.nextLine();
+                System.out.println("Beschreibung: ");
+                desc = scanner.nextLine();
+                System.out.println("Stunden: ");
+                hours = scanner.nextLine();
+                System.out.println("Startdatum (YYYY-MM-DD): ");
+                dateFrom = scanner.nextLine();
+                System.out.println("Enddatum (YYYY-MM-DD): ");
+                dateTo = scanner.nextLine();
+                System.out.println("Kurstyp (OE,BF,ZA,FF): ");
+                courseType = scanner.nextLine();
+
+                Optional<Course> courseOptionalUpdated = repo.update(new Course(course.getId(),name.equals("") ? course.getName() : name,desc.equals("") ? course.getDescr() : desc,hours.equals("") ? course.getHours() : Integer.parseInt(hours),dateFrom.equals("") ? course.getBeginDate() : Date.valueOf(dateFrom),dateTo.equals("") ? course.getEndDate() : Date.valueOf(dateTo),courseType.equals("") ? course.getCourseType():CourseType.valueOf(courseType)));
+
+                courseOptionalUpdated.ifPresentOrElse(
+                        (c)-> System.out.println("Kurs aktualisiert: "+c), //if true
+                        ()-> System.out.println("Kurs konnte nicht aktualisiert werden") //else
+                );
+            }
+        } catch (Exception e){
+            System.out.println("Unbekannter Fehler bei Kurs Update: "+e.getMessage());
+        }
+    }
+
+    private void deleteCourse(){
+        System.out.println("Welche Kurs löschen (ID)?");
+        Long courseIDToDelete = Long.parseLong(scanner.nextLine());
+
+        try {
+            repo.deleteById(courseIDToDelete);
+            repo.getAll();
+        } catch (IllegalArgumentException illegalArgumentException){
+            System.out.println("Eingabefehler: "+illegalArgumentException.getMessage());
+        } catch (InvalidValueException invalidValueException){
+            System.out.println("Kursdaten nicht korrekt angegeben: "+invalidValueException.getMessage());
+        } catch (MySQLDBException sqldbException){
+            System.out.println("DB Fehler beim Löschen: "+sqldbException.getMessage());
+        } catch (Exception e){
+            System.out.println("Unbekannter Fehler beim Löschen: "+e.getMessage());
+        }
+    }
+
+    private void courseSearch(){
+        System.out.println("Geben Sie einen Suchbegriff ein: ");
+        String searchString = scanner.nextLine();
+        List<Course> courseList;
+
+        try
+        {
+            courseList = repo.findAllCoursesByNameOrDescr(searchString);
+            for (Course course : courseList)
+            {
+                System.out.println(course);
+            }
+        } catch (MySQLDBException sqlException){
+            System.out.println("Datenbankfehler bei Kurssuche: "+sqlException.getMessage());
+        } catch (Exception e){
+            System.out.println("Unbekannter Fehler: "+e.getMessage());
+        }
+    }
+
     private void inputError()
     {
         System.out.println("Bitte nur Möglichkeiten der Menüauswahl eingeben!");
@@ -155,4 +245,6 @@ public class CLI {
         }
 
     }
+
+
 }
