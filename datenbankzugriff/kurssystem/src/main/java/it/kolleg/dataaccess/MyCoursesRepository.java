@@ -15,7 +15,7 @@ public interface MyCoursesRepository extends BaseRepository<Course,Long> {
     List<Course> findAllCoursesByDesc(String descr);
     List<Course> findAllCoursesByNameOrDescr(String searchText);
     List<Course> findAllCoursesByCourseType(CourseType courseType);
-    List<Course> findAllCoursesRunningCourses();
-    List<Course> findAllCoursesByByStartDate(Date startdate);
+    List<Course> findAllRunningCourses();
+    List<Course> findAllCoursesByStartDate(Date startdate);
 
 }

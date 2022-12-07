@@ -7,8 +7,6 @@ import it.kolleg.domain.CourseType;
 import it.kolleg.domain.InvalidValueException;
 
 import java.sql.Date;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
@@ -53,6 +51,9 @@ public class CLI {
                 case "6":
                     courseSearch();
                     break;
+                case "7":
+                    runningCourses();
+                    break;
                 case "x":
                     System.out.println("bye bye");
                     break;
@@ -72,6 +73,7 @@ public class CLI {
         System.out.println("------ Kursmanagement -----------------------------");
         System.out.println("(1) Kurs eingeben \t (2) Alle Kurse anzeigen \t (3)Kursdetails");
         System.out.println("(4) Kursdetails aktualisieren \t (5)Kurs löschen \t (6)Kurssuche");
+        System.out.println("(7) laufende Kurse");
         System.out.println("(x) Ende");
     }
 
@@ -217,6 +219,23 @@ public class CLI {
             System.out.println("Datenbankfehler bei Kurssuche: "+sqlException.getMessage());
         } catch (Exception e){
             System.out.println("Unbekannter Fehler: "+e.getMessage());
+        }
+    }
+
+    private void runningCourses(){
+        System.out.println("Aktuell laufende Kurse:");
+        List<Course> list;
+
+        try
+        {
+            list = repo.findAllRunningCourses();
+            for(Course course:list){
+                System.out.println(course);
+            }
+        } catch (MySQLDBException sqldbException){
+            System.out.println("Datenbankfehler für laufende Kurse: "+sqldbException.getMessage());
+        } catch (Exception e){
+            System.out.println("Unbekannter Fehler für laufende Kurse: "+e.getMessage());
         }
     }
 

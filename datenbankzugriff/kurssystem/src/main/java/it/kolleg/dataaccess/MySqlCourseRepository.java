@@ -242,12 +242,33 @@ public class MySqlCourseRepository implements MyCoursesRepository{
     }
 
     @Override
-    public List<Course> findAllCoursesRunningCourses() {
-        return null;
+    public List<Course> findAllRunningCourses() {
+        String sql = "SELECT * FROM `courses` WHERE NOW()<`enddate`";
+
+        try {
+            PreparedStatement preparedStatement = conn.prepareStatement(sql);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            ArrayList<Course> courses = new ArrayList<>();
+
+            while (resultSet.next()){
+                courses.add(new Course(
+                        resultSet.getLong("id"),
+                        resultSet.getString("name"),
+                        resultSet.getString("description"),
+                        resultSet.getInt("hours"),
+                        resultSet.getDate("begindate"),
+                        resultSet.getDate("enddate"),
+                        CourseType.valueOf(resultSet.getString("coursetype")) //String kommt zurück aber wird brauchen enum, umwandeln
+                ));
+            }
+            return courses;
+        } catch (SQLException e) {
+            throw new MySQLDBException(e.getMessage());
+        }
     }
 
     @Override
-    public List<Course> findAllCoursesByByStartDate(Date startdate) {
+    public List<Course> findAllCoursesByStartDate(Date startdate) {
         return null;
     }
 }

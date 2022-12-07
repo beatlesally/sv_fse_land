@@ -19,7 +19,7 @@ public class Main
 
         CLI mycli = null;
         try {
-            mycli = new CLI(new MySqlCourseRepository());
+            mycli = new CLI(new MySqlCourseRepository()); //Dependency Injection
             mycli.start();
         } catch (SQLException e) {
             System.out.println("DB-Fehler: "+e.getSQLState()+" \n"+e.getMessage());
