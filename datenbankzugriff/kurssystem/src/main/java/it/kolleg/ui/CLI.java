@@ -3,7 +3,10 @@ package it.kolleg.ui;
 import it.kolleg.dataaccess.MyCoursesRepository;
 import it.kolleg.dataaccess.MySQLDBException;
 import it.kolleg.domain.Course;
+import it.kolleg.domain.CourseType;
+import it.kolleg.domain.InvalidValueException;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +35,7 @@ public class CLI {
             switch (input)
             {
                 case "1":
-                    System.out.println("Kurseingabe");
+                    addCourse();
                     break;
                 case "2":
                     showAllCourses();
@@ -58,6 +61,54 @@ public class CLI {
         System.out.println("------ Kursmanagement -----------------------------");
         System.out.println("(1) Kurs eingeben \t (2) Alle Kurse anzeigen \t \t (3)Kursdetails");
         System.out.println("(x) Ende");
+    }
+
+    private void addCourse(){
+        String name, desc;
+        int hours;
+        Date beginDate, endDate;
+        CourseType courseType;
+
+        try
+        {
+            System.out.println("Bitte alle Kursdaten angeben:");
+
+            System.out.println("Name: ");
+            name = scanner.nextLine();
+            if(name.equals("")) throw new IllegalArgumentException("Eingabe darf nicht leer sein"); //Eingabevalidierung
+
+            System.out.println("Beschreibung: ");
+            desc = scanner.nextLine();
+            if(desc.equals("")) throw new IllegalArgumentException("Eingabe darf nicht leer sein");
+
+            System.out.println("Stundenanzahl: ");
+            hours = Integer.parseInt(scanner.nextLine());
+
+            System.out.println("Startdatum (YYYY-MM-DD)");
+            beginDate = Date.valueOf(scanner.nextLine());
+            System.out.println("Enddatum (YYYY-MM-DD)");
+            endDate = Date.valueOf(scanner.nextLine());
+
+            System.out.println("Kurstyp (OE,BF,ZA,FF)");
+            courseType = CourseType.valueOf(scanner.nextLine());
+
+            Optional<Course> optionalCourse = repo.insert(new Course(name,desc,hours,beginDate,endDate,courseType));
+
+            if(optionalCourse.isPresent()){
+                System.out.println("Kurs angelegt: "+optionalCourse.get());
+            } else {
+                System.out.println("Kurs konnte nicht angelegt werden");
+            }
+
+        } catch (IllegalArgumentException illegalArgumentException){
+            System.out.println("Eingabefehler: "+illegalArgumentException.getMessage());
+        } catch (InvalidValueException invalidValueException){
+            System.out.println("Kursdaten nicht korrekt angegeben: "+invalidValueException.getMessage());
+        } catch (MySQLDBException sqldbException){
+            System.out.println("DB Fehler beim Einfügen: "+sqldbException.getMessage());
+        } catch (Exception e){
+            System.out.println("Unbekannter Fehler beim Einfügen: "+e.getMessage());
+        }
     }
 
     private void showCourseDetails(){
