@@ -9,6 +9,12 @@ Inhaltsverzeichnis
     * [Daten abfragen](#daten-abfragen)
     * [Daten einfügen, aktualisieren, löschen](#daten-einfügen-aktualisieren-und-löschen)
 * [JDBC Intro 2](#jdbc-intro-2)
+    * [Singleton](#singleton)
+    * [DAO](#dao-data-access-object)
+    * [Kurssystem grundlegend](#kurssystem-grundlegend)
+        * [Aufbau und Funktionen der Repositories](#aufbau-der-repos)
+        * [Implementierung der Funktionen]
+        * []
 
 
 ## JDBC Intro 1
@@ -232,3 +238,10 @@ public static Connection getConn(String url, String user, String pwd) throws Cla
 Im Beispiel werden die Pattern für folgendes verwendet:
 * Singleton: Zugriff auf die Quelle (Verbindung soll nur einmal hergestellt werden)
 * DAO: Datensätze werden als Objekte aufbereitet
+
+### Kurssystem grundlegend
+tabellen spalten
+
+#### Aufbau der Repos
+
+#### CLI
