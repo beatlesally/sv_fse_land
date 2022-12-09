@@ -1,4 +1,10 @@
 package it.kolleg.dataaccess;
 
-public interface MyBookingsRepository extends BaseRepository{
+import it.kolleg.domain.Booking;
+
+import java.util.List;
+
+public interface MyBookingsRepository extends BaseRepository<Booking,Long>{
+
+    public List<Booking> showAllBookingsWithStudentsCourses();
 }

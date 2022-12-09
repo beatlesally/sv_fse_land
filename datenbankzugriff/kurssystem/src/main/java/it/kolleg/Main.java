@@ -3,6 +3,7 @@ package it.kolleg;
 import it.kolleg.dataaccess.MySQLDBConnection;
 import it.kolleg.dataaccess.MySQLDBException;
 import it.kolleg.dataaccess.MySqlCourseRepository;
+import it.kolleg.dataaccess.MySqlStudentRepository;
 import it.kolleg.ui.CLI;
 
 import java.sql.Connection;

@@ -1,7 +1,9 @@
 package it.kolleg.ui;
 
+import it.kolleg.dataaccess.BaseRepository;
 import it.kolleg.dataaccess.MyCoursesRepository;
 import it.kolleg.dataaccess.MySQLDBException;
+import it.kolleg.dataaccess.MySqlCourseRepository;
 import it.kolleg.domain.Course;
 import it.kolleg.domain.CourseType;
 import it.kolleg.domain.InvalidValueException;
@@ -14,7 +16,7 @@ import java.util.Scanner;
 public class CLI {
 
     Scanner scanner;
-    MyCoursesRepository repo;
+    BaseRepository repo;
 
 
     public CLI(MyCoursesRepository repo)
@@ -49,10 +51,10 @@ public class CLI {
                     deleteCourse();
                     break;
                 case "6":
-                    courseSearch();
+                    //courseSearch();
                     break;
                 case "7":
-                    runningCourses();
+                    //runningCourses();
                     break;
                 case "x":
                     System.out.println("bye bye");
@@ -73,7 +75,7 @@ public class CLI {
         System.out.println("------ Kursmanagement -----------------------------");
         System.out.println("(1) Kurs eingeben \t (2) Alle Kurse anzeigen \t (3)Kursdetails");
         System.out.println("(4) Kursdetails aktualisieren \t (5)Kurs löschen \t (6)Kurssuche");
-        System.out.println("(7) laufende Kurse");
+        System.out.println("(7) laufende Kurse (8) alle Studenten \t (9) Kurs buchen");
         System.out.println("(x) Ende");
     }
 
@@ -203,6 +205,7 @@ public class CLI {
         }
     }
 
+    /*
     private void courseSearch(){
         System.out.println("Geben Sie einen Suchbegriff ein: ");
         String searchString = scanner.nextLine();
@@ -210,7 +213,7 @@ public class CLI {
 
         try
         {
-            courseList = repo.findAllCoursesByNameOrDescr(searchString);
+            courseList = (MySqlCourseRepository)repo.findAllCoursesByNameOrDescr(searchString);
             for (Course course : courseList)
             {
                 System.out.println(course);
@@ -238,7 +241,7 @@ public class CLI {
             System.out.println("Unbekannter Fehler für laufende Kurse: "+e.getMessage());
         }
     }
-
+*/
     private void inputError()
     {
         System.out.println("Bitte nur Möglichkeiten der Menüauswahl eingeben!");
