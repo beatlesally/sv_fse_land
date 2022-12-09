@@ -4,29 +4,29 @@ import java.sql.Date;
 
 public class Booking extends BaseEntity{
 
-    private int fk_s;
-    private int fk_c;
+    private Long fk_s;
+    private Long fk_c;
     private Date bookingdate;
 
-    public Booking(Long id, int fk_s, int fk_c, Date bookingdate) {
+    public Booking(Long id, Long fk_s, Long fk_c, Date bookingdate) {
         super(id);
-        this.fk_s = fk_s;
-        this.fk_c = fk_c;
+        setFk_c(fk_c);
+        setFk_s(fk_s);
         this.bookingdate = bookingdate;
     }
 
-    public Booking(int fk_s, int fk_c, Date bookingdate) {
+    public Booking(Long fk_s, Long fk_c) {
         super(null);
-        this.fk_s = fk_s;
-        this.fk_c = fk_c;
-        this.bookingdate = bookingdate;
+        setFk_c(fk_c);
+        setFk_s(fk_s);
+        setBookingdate();
     }
 
-    public int getFk_s() {
+    public Long getFk_s() {
         return fk_s;
     }
 
-    public void setFk_s(int fk_s) {
+    public void setFk_s(Long fk_s) {
         if(fk_s > 0) {
             this.fk_s = fk_s;
         } else {
@@ -34,11 +34,11 @@ public class Booking extends BaseEntity{
         }
     }
 
-    public int getFk_c() {
+    public Long getFk_c() {
         return fk_c;
     }
 
-    public void setFk_c(int fk_c) {
+    public void setFk_c(Long fk_c) {
         if(fk_c > 0) {
             this.fk_c = fk_c;
         } else {
@@ -52,5 +52,10 @@ public class Booking extends BaseEntity{
 
     public void setBookingdate() {
         this.bookingdate = new Date(System.currentTimeMillis());
+    }
+
+    @Override
+    public String toString() {
+        return "[bookingID] "+getId()+" [bookingdate] "+getBookingdate();
     }
 }

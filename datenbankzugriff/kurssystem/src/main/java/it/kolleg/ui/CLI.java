@@ -1,10 +1,7 @@
 package it.kolleg.ui;
 
 import it.kolleg.dataaccess.*;
-import it.kolleg.domain.Course;
-import it.kolleg.domain.CourseType;
-import it.kolleg.domain.InvalidValueException;
-import it.kolleg.domain.Student;
+import it.kolleg.domain.*;
 
 import java.sql.Date;
 import java.util.List;
@@ -37,7 +34,7 @@ public class CLI {
             switch (input)
             {
                 case "1":
-                    //addCourse();
+                    addCourse();
                     break;
                 case "2":
                     showAllCourses();
@@ -72,6 +69,21 @@ public class CLI {
                 case "12":
                     findStudentByNameLike();
                     break;
+                case "13":
+                    allBookings();
+                    break;
+                case "14":
+                    showBookingDetails();
+                    break;
+                case "15":
+                    createBooking();
+                    break;
+                case "16":
+                    deleteBooking();
+                    break;
+                case "17":
+                    allBookingBeforeDate();
+                    break;
                 case "x":
                     System.out.println("bye bye");
                     break;
@@ -93,7 +105,90 @@ public class CLI {
         System.out.println("(4) Kursdetails aktualisieren \t (5)Kurs löschen \t (6)Kurssuche");
         System.out.println("(7) laufende Kurse (8) alle Studenten \t (9) Student anlegen");
         System.out.println("(10) Student ändern \t (11) Student löschen \t (12) Student bei Namen finden");
+        System.out.println("(13) alle Buchungen \t (14) Buchungsdetails \t (15) Buchung erstellen");
+        System.out.println("(16) Buchung löschen \t (17) Buchungen vor best. Datum");
         System.out.println("(x) Ende");
+    }
+
+
+
+    //-------------------------------Booking----------------------------------------------------------------
+
+    private String getStudentNameByFk(Booking b){
+        return studentRepo.getById(b.getFk_s()).get().getStudentname();
+    }
+
+    private String getCourseNameByFk(Booking b){
+        return courseRepo.getById(b.getFk_c()).get().getName();
+    }
+
+    private void allBookings(){
+        try {
+            List<Booking> bookings = bookingsRepo.getAll();
+            for(Booking b:bookings){
+                System.out.println(b+" [student] "+ getStudentNameByFk(b)+" [course] "+getCourseNameByFk(b));
+            }
+        } catch (MySQLDBException sqldbException){
+            System.out.println("DB Fehler bei Anzeige aller Buchungen");
+        }
+    }
+
+    private void showBookingDetails(){
+        try {
+            System.out.println("Für welche BuchungsID?");
+            allBookings();
+            String bookingID = scanner.nextLine();
+            Optional<Booking> optionalBooking = bookingsRepo.getById(Long.parseLong(bookingID));
+
+            if(optionalBooking.isPresent()){
+                Booking booking = optionalBooking.get();
+                System.out.println(booking+" [student] "+getStudentNameByFk(booking)+" [course] "+getCourseNameByFk(booking));
+            }
+
+        } catch (MySQLDBException sqldbException){
+            System.out.println("DB-Fehler: "+sqldbException.getMessage());
+        }
+    }
+
+    private void createBooking(){
+        System.out.println("Buchungsdaten angeben:");
+
+        System.out.println("StudentID: ");
+        Long s_id = Long.parseLong(scanner.nextLine());
+        System.out.println("KursID: ");
+        Long c_id = Long.parseLong(scanner.nextLine());
+
+        try {
+            Optional<Booking> optionalBooking = bookingsRepo.insert(new Booking(s_id,c_id));
+            if(optionalBooking.isPresent()){
+                Booking booking = optionalBooking.get();
+                System.out.println(booking+" [student] "+getStudentNameByFk(booking)+" [course] "+getCourseNameByFk(booking));
+            }
+        } catch (MySQLDBException sqldbException){
+            System.out.println("DB Fehler: "+sqldbException.getMessage());
+        } catch (Exception e){
+            System.out.println("Fehler: "+e.getMessage());
+        }
+    }
+
+    private void deleteBooking(){
+        System.out.println("Für welche BuchungsID?");
+        Long bookingID = Long.parseLong(scanner.nextLine());
+        bookingsRepo.deleteById(bookingID);
+    }
+
+    private void allBookingBeforeDate(){
+        System.out.println("Bitte Datum angeben (YYYY-MM-DD)");
+        Date searchdate = Date.valueOf(scanner.nextLine());
+
+        List<Booking> bookingsbefore = bookingsRepo.showAllBookingsBeforeDate(searchdate);
+        if(bookingsbefore.size() == 0){
+            System.out.println("Keine Buchungen vor "+searchdate);
+        } else {
+            for(Booking b:bookingsbefore){
+                System.out.println(b+" [student] "+getStudentNameByFk(b)+" [course] "+getCourseNameByFk(b));
+            }
+        }
     }
 
 
