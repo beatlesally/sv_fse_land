@@ -122,6 +122,19 @@ public class MySqlStudentRepository implements MyStudentRepository{
 
     @Override
     public List<Student> findAllStudentsByNameLike(String search) {
-        return null;
+        try {
+            String sql = "SELECT * FROM `student` WHERE LOWER(`name`) LIKE LOWER(?)";
+            PreparedStatement preparedStatement = conn.prepareStatement(sql);
+            preparedStatement.setString(1, "%"+search+"%");
+            ResultSet resultSet = preparedStatement.executeQuery();
+            List<Student> students = new ArrayList<>();
+
+            while (resultSet.next()){
+                students.add(new Student(resultSet.getLong(1),resultSet.getString(2),resultSet.getString(3)));
+            }
+            return students;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

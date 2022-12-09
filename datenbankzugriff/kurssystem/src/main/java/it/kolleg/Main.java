@@ -1,12 +1,8 @@
 package it.kolleg;
 
-import it.kolleg.dataaccess.MySQLDBConnection;
-import it.kolleg.dataaccess.MySQLDBException;
-import it.kolleg.dataaccess.MySqlCourseRepository;
-import it.kolleg.dataaccess.MySqlStudentRepository;
+import it.kolleg.dataaccess.*;
 import it.kolleg.ui.CLI;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
@@ -20,7 +16,7 @@ public class Main
 
         CLI mycli = null;
         try {
-            mycli = new CLI(new MySqlCourseRepository()); //Dependency Injection
+            mycli = new CLI(new MySqlStudentRepository(), new MySqlCourseRepository(), new MySqlBookingsRepository()); //Dependency Injection
             mycli.start();
         } catch (SQLException e) {
             System.out.println("DB-Fehler: "+e.getSQLState()+" \n"+e.getMessage());

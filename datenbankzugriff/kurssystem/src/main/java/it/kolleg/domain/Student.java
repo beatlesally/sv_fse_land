@@ -40,4 +40,9 @@ public class Student extends BaseEntity{
             throw new InvalidValueException("Studentenmail muss im Bereich liegen (3-200 Zeichen)");
         }
     }
+
+    @Override
+    public String toString() {
+        return "[studentid] " + getId() + " [studentname] "+ getStudentname() + " [studentmail] " + getStudentmail();
+    }
 }

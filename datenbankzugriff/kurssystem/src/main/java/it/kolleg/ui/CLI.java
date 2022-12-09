@@ -1,12 +1,10 @@
 package it.kolleg.ui;
 
-import it.kolleg.dataaccess.BaseRepository;
-import it.kolleg.dataaccess.MyCoursesRepository;
-import it.kolleg.dataaccess.MySQLDBException;
-import it.kolleg.dataaccess.MySqlCourseRepository;
+import it.kolleg.dataaccess.*;
 import it.kolleg.domain.Course;
 import it.kolleg.domain.CourseType;
 import it.kolleg.domain.InvalidValueException;
+import it.kolleg.domain.Student;
 
 import java.sql.Date;
 import java.util.List;
@@ -16,13 +14,16 @@ import java.util.Scanner;
 public class CLI {
 
     Scanner scanner;
-    BaseRepository repo;
+    private MyStudentRepository studentRepo;
+    private MyCoursesRepository courseRepo;
+    private MyBookingsRepository bookingsRepo;
 
-
-    public CLI(MyCoursesRepository repo)
+    public CLI(MyStudentRepository studentrepo, MyCoursesRepository courserepo, MyBookingsRepository bookingrepo)
     {
         this.scanner = new Scanner(System.in);
-        this.repo = repo;
+        this.studentRepo = studentrepo;
+        this.courseRepo = courserepo;
+        this.bookingsRepo = bookingrepo;
     }
 
     public void start()
@@ -36,7 +37,7 @@ public class CLI {
             switch (input)
             {
                 case "1":
-                    addCourse();
+                    //addCourse();
                     break;
                 case "2":
                     showAllCourses();
@@ -51,10 +52,25 @@ public class CLI {
                     deleteCourse();
                     break;
                 case "6":
-                    //courseSearch();
+                    courseSearch();
                     break;
                 case "7":
-                    //runningCourses();
+                    runningCourses();
+                    break;
+                case "8":
+                    showAllStudents();
+                    break;
+                case "9":
+                    createStudent();
+                    break;
+                case "10":
+                    changeStudent();
+                    break;
+                case "11":
+                    deleteStudent();
+                    break;
+                case "12":
+                    findStudentByNameLike();
                     break;
                 case "x":
                     System.out.println("bye bye");
@@ -75,9 +91,118 @@ public class CLI {
         System.out.println("------ Kursmanagement -----------------------------");
         System.out.println("(1) Kurs eingeben \t (2) Alle Kurse anzeigen \t (3)Kursdetails");
         System.out.println("(4) Kursdetails aktualisieren \t (5)Kurs löschen \t (6)Kurssuche");
-        System.out.println("(7) laufende Kurse (8) alle Studenten \t (9) Kurs buchen");
+        System.out.println("(7) laufende Kurse (8) alle Studenten \t (9) Student anlegen");
+        System.out.println("(10) Student ändern \t (11) Student löschen \t (12) Student bei Namen finden");
         System.out.println("(x) Ende");
     }
+
+
+    //------------------------------Student------------------------------------------------------------------
+    private void showAllStudents(){
+        List<Student> students = studentRepo.getAll();
+        if(students.size() == 0){
+            System.out.println("Keine Studenten verfügbar");
+        } else {
+            for (Student s : students) {
+                System.out.println(s);
+            }
+        }
+
+    }
+
+    private void createStudent(){
+        String name, email;
+        try
+        {
+            System.out.println("Bitte alle Studentendaten angeben:");
+
+            System.out.println("Name: ");
+            name = scanner.nextLine();
+            if(name.equals("")) throw new IllegalArgumentException("Eingabe darf nicht leer sein"); //Eingabevalidierung
+
+            System.out.println("Email: ");
+            email = scanner.nextLine();
+            if(email.equals("")) throw new IllegalArgumentException("Eingabe darf nicht leer sein");
+
+            Optional<Student> optionalStudent = studentRepo.insert(new Student(name,email));
+
+            if(optionalStudent.isPresent()){
+                System.out.println("Student angelegt: "+ optionalStudent.get());
+            } else {
+                System.out.println("Student konnte nicht angelegt werden");
+            }
+
+        } catch (IllegalArgumentException illegalArgumentException){
+            System.out.println("Eingabefehler: "+illegalArgumentException.getMessage());
+        } catch (InvalidValueException invalidValueException){
+            System.out.println("Studentendaten nicht korrekt angegeben: "+invalidValueException.getMessage());
+        } catch (MySQLDBException sqldbException){
+            System.out.println("DB Fehler beim Einfügen: "+sqldbException.getMessage());
+        } catch (Exception e){
+            System.out.println("Unbekannter Fehler beim Einfügen: "+e.getMessage());
+        }
+    }
+
+    private void changeStudent(){
+        System.out.println("Für welche StudentenID Details ändern?");
+        Long studentID = Long.parseLong(scanner.nextLine());
+
+        try
+        {
+            Optional<Student> studentOptional = studentRepo.getById(studentID);
+            if(studentOptional.isEmpty()){
+                System.out.println("Student mit ID "+ studentID +" nicht gefunden");
+            } else {
+                Student student = studentOptional.get();
+                System.out.println("Änderungen für folgenden Studenten: ");
+                System.out.println(student);
+
+                String name, mail;
+                System.out.println("Bitte neue Studentendaten angeben (Enter falls keine Änderung gewünscht ist)");
+                System.out.println("Name: ");
+                name = scanner.nextLine();
+                System.out.println("Email: ");
+                mail = scanner.nextLine();
+
+                Optional<Student> studentOptionalUpdated = studentRepo.update(new Student(student.getId(),name.equals("") ? student.getStudentname() : name,mail.equals("") ? student.getStudentmail() : mail));
+
+                studentOptionalUpdated.ifPresentOrElse(
+                        (c)-> System.out.println("Student aktualisiert: "+c), //if true
+                        ()-> System.out.println("Student konnte nicht aktualisiert werden") //else
+                );
+            }
+        } catch (Exception e){
+            System.out.println("Unbekannter Fehler bei Student Update: "+e.getMessage());
+        }
+
+    }
+
+    private void deleteStudent(){
+        try {
+            System.out.println("Welchen StudentID löschen?");
+            Long studentID = Long.parseLong(scanner.nextLine());
+            studentRepo.deleteById(studentID);
+        } catch (Exception e){
+            System.out.println("Unbekannter Fehler beim Student Löschen");
+        }
+    }
+
+    private void findStudentByNameLike(){
+        System.out.println("Suchbegriff eingeben: ");
+        String search = scanner.nextLine();
+
+        try {
+            List<Student> students = studentRepo.findAllStudentsByNameLike(search);
+            for (Student s:students){
+                System.out.println(s);
+            }
+        } catch (MySQLDBException sqldbException) {
+            System.out.println(sqldbException.getMessage());
+        }
+    }
+
+
+    // ------------------------- Course ------------------------------------------------
 
     private void addCourse(){
         String name, desc;
@@ -108,7 +233,7 @@ public class CLI {
             System.out.println("Kurstyp (OE,BF,ZA,FF)");
             courseType = CourseType.valueOf(scanner.nextLine());
 
-            Optional<Course> optionalCourse = repo.insert(new Course(name,desc,hours,beginDate,endDate,courseType));
+            Optional<Course> optionalCourse = courseRepo.insert(new Course(name,desc,hours,beginDate,endDate,courseType));
 
             if(optionalCourse.isPresent()){
                 System.out.println("Kurs angelegt: "+optionalCourse.get());
@@ -132,7 +257,7 @@ public class CLI {
         Long courseID = Long.parseLong(scanner.nextLine());
         try
         {
-            Optional<Course> courseOptional = repo.getById(courseID);
+            Optional<Course> courseOptional = courseRepo.getById(courseID);
             if(courseOptional.isPresent())
             {
                 System.out.println(courseOptional.get());
@@ -152,7 +277,7 @@ public class CLI {
 
         try
         {
-            Optional<Course> courseOptional = repo.getById(courseID);
+            Optional<Course> courseOptional = courseRepo.getById(courseID);
             if(courseOptional.isEmpty()){
                 System.out.println("Kurs mit ID "+courseID+" nicht gefunden");
             } else {
@@ -175,7 +300,7 @@ public class CLI {
                 System.out.println("Kurstyp (OE,BF,ZA,FF): ");
                 courseType = scanner.nextLine();
 
-                Optional<Course> courseOptionalUpdated = repo.update(new Course(course.getId(),name.equals("") ? course.getName() : name,desc.equals("") ? course.getDescr() : desc,hours.equals("") ? course.getHours() : Integer.parseInt(hours),dateFrom.equals("") ? course.getBeginDate() : Date.valueOf(dateFrom),dateTo.equals("") ? course.getEndDate() : Date.valueOf(dateTo),courseType.equals("") ? course.getCourseType():CourseType.valueOf(courseType)));
+                Optional<Course> courseOptionalUpdated = courseRepo.update(new Course(course.getId(),name.equals("") ? course.getName() : name,desc.equals("") ? course.getDescr() : desc,hours.equals("") ? course.getHours() : Integer.parseInt(hours),dateFrom.equals("") ? course.getBeginDate() : Date.valueOf(dateFrom),dateTo.equals("") ? course.getEndDate() : Date.valueOf(dateTo),courseType.equals("") ? course.getCourseType():CourseType.valueOf(courseType)));
 
                 courseOptionalUpdated.ifPresentOrElse(
                         (c)-> System.out.println("Kurs aktualisiert: "+c), //if true
@@ -192,8 +317,8 @@ public class CLI {
         Long courseIDToDelete = Long.parseLong(scanner.nextLine());
 
         try {
-            repo.deleteById(courseIDToDelete);
-            repo.getAll();
+            courseRepo.deleteById(courseIDToDelete);
+            courseRepo.getAll();
         } catch (IllegalArgumentException illegalArgumentException){
             System.out.println("Eingabefehler: "+illegalArgumentException.getMessage());
         } catch (InvalidValueException invalidValueException){
@@ -205,7 +330,7 @@ public class CLI {
         }
     }
 
-    /*
+
     private void courseSearch(){
         System.out.println("Geben Sie einen Suchbegriff ein: ");
         String searchString = scanner.nextLine();
@@ -213,7 +338,7 @@ public class CLI {
 
         try
         {
-            courseList = (MySqlCourseRepository)repo.findAllCoursesByNameOrDescr(searchString);
+            courseList = courseRepo.findAllCoursesByNameOrDescr(searchString);
             for (Course course : courseList)
             {
                 System.out.println(course);
@@ -231,7 +356,8 @@ public class CLI {
 
         try
         {
-            list = repo.findAllRunningCourses();
+
+            list = courseRepo.findAllRunningCourses();
             for(Course course:list){
                 System.out.println(course);
             }
@@ -241,7 +367,7 @@ public class CLI {
             System.out.println("Unbekannter Fehler für laufende Kurse: "+e.getMessage());
         }
     }
-*/
+
     private void inputError()
     {
         System.out.println("Bitte nur Möglichkeiten der Menüauswahl eingeben!");
@@ -249,7 +375,7 @@ public class CLI {
 
     private void showAllCourses(){
         List<Course> list = null;
-        list = repo.getAll();
+        list = courseRepo.getAll();
 
         try{
             if (list.size() > 0) {
