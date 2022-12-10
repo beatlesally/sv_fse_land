@@ -96,7 +96,7 @@ try(Connection conn = DriverManager.getConnection(connectionUrl, user, pwd))
 
 ### Daten abfragen
 Nach dem Herstellen der Verbindung können Daten abgefragt werden. 
-* wird eine Select nach einem bestimmten Buchstaben ausgeführt, wird ein anderes SQl-Statement benötigt, sowie ein ? Platzhalter in diesem Statement; siehe [Daten einfügen, aktualisieren, löschen](#daten-einfügen-aktualisieren-und-löschen) für Erklärung
+* wird eine Select nach einem bestimmten Buchstaben ausgeführt, wird ein anderes SQL-Statement benötigt, sowie ein ? Platzhalter in diesem Statement; siehe [Daten einfügen, aktualisieren, löschen](#daten-einfügen-aktualisieren-und-löschen) für Erklärung
 
 Nötig dafür:
 * Variable vom Typ `PreparedStatement`: dort wird die Abfrage vorbereitet; am `Connection` Objekt wird mit `prepareStatement(sqlstatement)` die SQL Abfrage als String als Parameter übergeben
@@ -142,7 +142,7 @@ Nötig dafür:
 
 * Variable vom Typ `PreparedStatement`: dort wird die Abfrage vorbereitet; am `Connection` Objekt wird mit `prepareStatement(sqlstatement)` die SQL Abfrage als String als Parameter übergeben; Datenwerte werden beim INSERT mit ? ersetzt
     * so wird das Statement bereits vorbereitet und kompiliert. Es werden damit SQL-Injections vermieden, weil SQL-Statements wo eigentlich Daten sein sollten, nicht ausgeführt werden, wenn hardcodiert/direkt eingefügt. Mit `setString(stelle,wert), setInt(stelle,wert), ...` werden an den ? die Daten nachträglich eingetragen; auf Datentyp achten!
-* `executeUpdate()`: Statement wird ausgeführt; gibt die Anzahl der betroffenen Reihen zurück
+* `executeUpdate()`: Statement führt Änderung der Daten aus; gibt die Anzahl der betroffenen Reihen zurück
 * Es kann nur durch das SQL-Statement selbst zwischen Einfügen, Aktualisieren und Löschen unterschieden werden. Der Grundaufbau ist für alle gleich.
 
 
@@ -198,7 +198,7 @@ try
 ```
 
 ## JDBC Intro 2
-In diesem zweiten Teil werden zwei neue Pattern behandelt:
+In diesem zweiten Teil werden zwei neue Pattern behandelt. Die neuen Inhalte werden am Beispiel eines Kurssystems angewendet, für das in einer weiteren Aufgabe eigenständig die Erweiterung von Student und Buchungen textuell beschrieben werden soll. Ich habe diese Erweiterung ausprogrammiert. Deswegen wird hier nur eine kurze Beschreibung und ein UML-Diagramm eingefügt.
 
 ### Singleton
 > "Es stellt sicher, dass von einer Klasse genau ein Objekt existiert."
@@ -226,7 +226,7 @@ public static Connection getConn(String url, String user, String pwd) throws Cla
 ### DAO (Data Access Object)
 > "...ist ein Entwurfsmuster, das den Zugriff auf unterschiedliche Arten von Datenquellen (z. B. Datenbanken, Dateisystem) so kapselt, dass die angesprochene Datenquelle ausgetauscht werden kann, ohne dass der aufrufende Code geändert werden muss."
 >  https://de.wikipedia.org/wiki/Data_Access_Object
-* Daten aus einer DB werden so aufgearbeitet, dass sie als Objekt verfügbar sind; somit ist damit als Programmierer leichter zu arbeiten als mit einem Datensatz
+* Daten aus einer DB werden so aufgearbeitet, dass sie als Objekt verfügbar sind; somit ist damit als Programmierer leichter zu arbeiten als mit einem Datensatz; welche Quelle ist egal, jede Quelle erstellt immer das gleiche Objekt
 
 * für jede Entity und den Zugriff wird das Interface ausimplementiert
 
@@ -237,11 +237,236 @@ public static Connection getConn(String url, String user, String pwd) throws Cla
 
 Im Beispiel werden die Pattern für folgendes verwendet:
 * Singleton: Zugriff auf die Quelle (Verbindung soll nur einmal hergestellt werden)
-* DAO: Datensätze werden als Objekte aufbereitet
+* DAO: Datensätze von SQL erhalten und in Objekt umgewandelt
 
-### Kurssystem grundlegend
-tabellen spalten
+### Objektrelationales Mapping
+> "... ist eine Technik der Softwareentwicklung, mit der ein in einer objektorientierten Programmiersprache geschriebenes Anwendungsprogramm seine Objekte in einer relationalen Datenbank ablegen kann."
+> https://de.wikipedia.org/wiki/Objektrelationale_Abbildung
 
-#### Aufbau der Repos
+### CLI
+Es gibt einen Default-Aufbau einer CLI, der immer wieder verwendet werden kann:
+* "Endlos"-Schleife mit Bedingung für Abbruch
+* Methode zur Menüübersicht: `showMenu()`
+* Methode zum Melden bei nicht verfügbaren Case: `inputError()`
+* Methoden für die Funktionen + I/O: `deleteCourse()`
+* Methode start() zum Starten der CLI: `start()`
+    * Switch-Case in denen die Funktionen (I/O) aufgerufen werden
+```java
+public class CLI {
 
-#### CLI
+    //Datenfelder & Konstruktor hier ausgelassen
+
+    public void start()
+    {
+        String input = "";
+
+        while(!input.equals("x"))
+        {
+            showMenu();
+            input = this.scanner.nextLine();
+            switch (input)
+            {
+                case "1":
+                    addCourse();
+                    break;
+                case "2":
+                    showAllCourses();
+                    break;
+                case "3":
+                    showCourseDetails();
+                    break;
+                case "4":
+                    updateCourseDetails();
+                    break;
+                case "5":
+                    deleteCourse();
+                    break;
+                default:
+                    inputError();
+                    break;
+            }
+        }
+        scanner.close();
+    }
+
+    private void showMenu() //Menü für die Übersicht der Möglichkeiten
+    {
+        System.out.println("------ Kursmanagement -----------------------------");
+        System.out.println("(1) Kurs eingeben \t (2) Alle Kurse anzeigen \t (3)Kursdetails");
+        System.out.println("(4) Kursdetails aktualisieren \t (5)Kurs löschen");
+        System.out.println("(x) Ende");
+    }
+
+    private void inputError() //für Eingaben die nicht im Switch-Case behandelt werden
+    {
+        System.out.println("Bitte nur Möglichkeiten der Menüauswahl eingeben!");
+    }
+
+    private void deleteCourse(){
+        System.out.println("Welche Kurs löschen (ID)?");
+        Long courseIDToDelete = Long.parseLong(scanner.nextLine());
+
+        try {
+            courseRepo.deleteById(courseIDToDelete);
+            courseRepo.getAll();
+        } catch (IllegalArgumentException illegalArgumentException){
+            System.out.println("Eingabefehler: "+illegalArgumentException.getMessage());
+        } catch (InvalidValueException invalidValueException){
+            System.out.println("Kursdaten nicht korrekt angegeben: "+invalidValueException.getMessage());
+        } catch (MySQLDBException sqldbException){
+            System.out.println("DB Fehler beim Löschen: "+sqldbException.getMessage());
+        } catch (Exception e){
+            System.out.println("Unbekannter Fehler beim Löschen: "+e.getMessage());
+        }
+    }
+
+}
+
+```
+### Exceptions
+Exceptions verfolgen folgendes Prinzip:
+1. es wird versucht einen Codeabschnitt aufzuführen(try)
+1. bei einem aufgetretenen Fehler, wirft dieser Abschnitt eine Exception(throw)
+1. diese muss dann aufgefangen werden(catch)
+```java
+//Bsp wo eine Exception geworfen wird, wenn ein Fehler auftaucht
+public void setName(String name) throws InvalidValueException { //muss nicht, weil unhandled expection weil von RuntimeException erbt
+    if (name != null && name.length() > 1) {
+        this.name = name;
+    } else {
+        throw new InvalidValueException("Kursname muss mindestens 2 Zeichen lang sein!");
+    }
+}
+
+//Bsp wo diese Exception auftreten kann und gefangen wird
+//Beispiel stark gekürzt!
+
+//...
+try{
+    Optional<Course> optionalCourse = courseRepo.insert(new Course(name,desc,hours,beginDate,endDate,courseType));
+
+    if(optionalCourse.isPresent()){
+        System.out.println("Kurs angelegt: "+optionalCourse.get());
+    } else {
+        System.out.println("Kurs konnte nicht angelegt werden");
+    }
+} catch (InvalidValueException invalidValueException){
+System.out.println("Kursdaten nicht korrekt angegeben: "+invalidValueException.getMessage());
+} 
+
+//...
+```
+Es gibt viele vorgefertigte Exceptions, bei deinen zwischen zwei Typen unterschieden werden muss. Dadurch wird auch klar, ob diese Exception behandelt werden muss oder nicht:
+* checked: werden nicht von der Laufzeitumgebung behandelt und müssen vom Programmierer im Code abgefangen werden sowie in throws Klausel des Methodenkopfs "vermerkt sein" (`Exception`)
+* unchecked: werden von der Laufzeitumgebung behandelt (`RuntimeException`)
+
+Es können auch eigene Exceptions erstellt werden. Sie müssen nur von `RuntimeException` oder `Exception` erben (je nachdem ob Exception unchecked/checked sein soll), im Konstruktur einen String-Parameter haben und diesen Parameter an den Mutterkonstruktur übergeben.
+```java
+public class MySQLDBException extends RuntimeException {
+    public MySQLDBException(String message) {
+        super(message);
+    }
+}
+```
+### Erben von Interfaces
+Interfaces können von anderen Interfaces erben. Dies wird benötigt, wenn ein Interface grundlegende Funktionen vorgibt(z.B. `BaseRepository` mit CRUD-Operationen) und das andere Interface mehr maßgeschneiderte Funktionen(z.B. `MyCoursesRepository` mit Funktionen die nur für die Entity `Course` funktionieren/Sinn ergeben) bereitstellt und auch die grundlegenden vom einen Interface beinhalten möchte. 
+
+### Domänenklassen
+Die Domänenklassen sind dafür da, die Entitäten als Objekt abzubilden. Anzumerken hierbei ist, dass jede Domänenklassen über 2 Konstruktor verfügt. Hierfür ist einer für Insert in die Datenbank von neuen Objekten (id==null; weil von auto increment selbst erzeugt), der andere ist für Datensätze, die bereits in der Datenbank bestehen (haben bereits ID), aus dieser geholt und als Objekt gemappt werden.
+
+* BaseEntity (abstrakte Klasse, die ID als Datenfeld hat -> jede Entity hat ID!)
+    * Booking
+    * Courses
+    * Student
+
+### Kurssystem grundlegend (DB-seitig)
+* DB: kurssystem
+    * Tabelle: courses 
+        * kursnummer
+        * name
+        * beschreibung 
+        * stunden
+        * startdatum 
+        * enddatum
+        * kurstyp
+    * Tabelle: student
+        * studentennummer
+        * name
+        * email
+    * Tabelle: bookings
+        * id
+        * fk_s (StudentID)
+        * fk_c (CourseID)
+        * datum
+#### Aufbau der Repos grundlegend
+* `BaseRepostitory` mit Standart-CRUD-Methoden
+    * `MyEntityRepository` mit speziellen Methoden für die spezielle Entity (jede Entity = eigenes Repository)
+        * `MySQLEntityRepository` Ausimplementierung speziell für SQL (jede Datenquelle = eigenes Repository)
+
+#### Aufbau der Repos für Kurssystem
+* `BaseRepostitory`
+    * `MyBookingsRepository` 
+    * `MyCourseRepository` 
+    * `MyStudentRepository` 
+        * `MySQLCourseRepository`
+        * `MySQLStudentRepository`
+        * `MySQLBookingRepository`
+### CRUD-Operationen mit DAO-Pattern
+Die Basic-CRUD Operation (insert,select*,select by id, update, delete) sind unabhängig von der Entity gleich. 
+
+```java
+public interface BaseRepository<T,I> { //parametrisiert! bei implements festlegen
+
+    Optional<T> insert(T entity); 
+    Optional<T> getById(I id); 
+    List<T> getAll();
+    Optional<T> update(T entity);
+    void deleteById(I id);
+
+}
+```
+#### Parametrisierung
+Unter Parametrisierung wird verstanden, dass beim `implements/extends` also nachträglich festlegt wird, mit welchen Typen dieses Interface arbeitet. Somit ist es dynamischer. Im obigen Beispiel wird `BaseRepository<T,I>` mit `<T,I>` parametrisiert. `T` steht hier für die Entity und `I` für den Typ der ID. Diese Parameter ziehen sich durch alle Methoden. Erst beim `implements/extends` müssen die Parameter gesetzt werden:
+```java
+//Hier wurde mehrere Codeabschnitte zur besseren Codeübersicht ausgelassen
+
+//MyBookingsRepository extends BaseRepository; dieses Repository wird nur mit Entitäten vom Typ Booking arbeiten, die ID ist wie bei den anderen Long
+public interface MyBookingsRepository extends BaseRepository<Booking,Long>{/******/}
+
+//Hier sieht man, dass T & I mit den gesetzten Typ ersetzt wurden!
+public class MySqlBookingsRepository implements MyBookingsRepository{
+    public Optional<Booking> insert(Booking entity) {/*******/}
+    public Optional<Booking> getById(Long id) {/*******/}
+    public List<Booking> getAll() {/*******/}
+    public Optional<Booking> update(Booking entity) {/*******/}
+    public void deleteById(Long id) {/*******/}
+}
+```
+#### Optional
+> "Ein Optional ist eine Objekt, das man sich als Datenbehälter vorstellen kann, der entweder einen Wert enthält oder leer (empty) ist. Leer ist hier auch nicht gleichbedeutend mit null!"
+> https://javabeginners.de/Grundlagen/Datentypen/Optionals.php
+
+* leeres Optional: `Optional<String> oe = Optional.empty();`
+* Optional befüllen: `Optional<String> os = Optional.of("Hallo Welt!");`
+    * Typ in `of()` muss mit Typ bei Deklaration übereinstimmen!
+* Zugriff auf Inhalt in Optional: `os.get()`
+    * wenn Inhalt jedoch leer/null, dann wird `NoSuchElementException` geworfen
+    * deswegen vorher prüfen mit: `os.isPresent()` oder `os.isEmpty()` - liefert true oder false
+* If-Else (iterativ): wenn not empty/null dann sout, sonst getWarning(): 
+    `onb.ifPresentOrElse(s -> System.out.println("Inhalt vorhanden!"),getWarning());`
+
+### Implementierung mit Student und Bookings (Kurzbeschreibung + fertiges UML)
+Vorgehensweise:
+* Tabelle bookings und student erstellen
+* jeweils zwei Einträge erstellen (für Tests)
+* Entity-Klasse für student und booking erstellen
+    * Bussinesslogik in Setter einbauen
+* Repository für Student und Bookings erstellen und von `BaseRepository` erben lassen
+* `CLI`-Konstruktor um zwei Parameter erweitern und zwei Datenfelder hinzufügen (Typ `MyBookingsRepository` & `MyStudentRepository`)
+* `MySqlBookingsRepository`  erstellen, von `MyBookingsRepository` erben lassen, CRUD und spezielle Methoden ausimplementieren
+    * `conn` Objekt in Konstruktor über `getConn()` holen und als Datenfeld speichern
+* `MySqlStudentRepository` erstellen, von `MyStudentRepository` erben lassen, CRUD und spezielle Methoden ausimplementieren
+    * `conn` Objekt in Konstruktor über `getConn()` holen und als Datenfeld speichern
+* `CLI` um Funktionen der beiden Klassen erweitern
+* testen!
+![Alt text](pics/Screenshot%202022-12-10%20103625.png)
