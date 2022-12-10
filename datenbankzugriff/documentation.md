@@ -464,6 +464,7 @@ public class MySqlBookingsRepository implements MyBookingsRepository{
 
 ### Implementierung mit Student und Bookings (Kurzbeschreibung + fertiges UML)
 > Für die komplette Ausimplementierung bitte im Repository die Codeteile einsehen!
+
 Vorgehensweise:
 * Tabelle bookings und student erstellen
 * jeweils zwei Einträge erstellen (für Tests)
