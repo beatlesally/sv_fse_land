@@ -41,7 +41,7 @@ Apache und MySQL über das XAMPP Control Panel starten.
     bei abweichenden Apache Port (80,443) URL anpassen
 
 Dort können auch SQL Statements auf ihre Richtigkeit geprüft werden.
-![SQL](../../../../../../C:/school/5AAIF/FSE_LAND/sv_fse_land/datenbankzugriff/pics/Screenshot%202022-11-23%20105444.png)
+![SQL](pics/Screenshot%202022-11-23%20105444.png)
 
 Als nächstes wird mit IntelliJ ein neues Maven Projekt erstellt. Hierfür ist eine funktionierende Maven-Installation notwendig.
 
@@ -50,7 +50,7 @@ Als nächstes wird mit IntelliJ ein neues Maven Projekt erstellt. Hierfür ist e
 
 Ein neues Maven Projekt wird mit IntelliJ erstellt.
 
-![Create Project](../../../../../../C:/school/5AAIF/FSE_LAND/sv_fse_land/datenbankzugriff/pics/Screenshot%202022-11-23%20084421.png)
+![Create Project](pics/Screenshot%202022-11-23%20084421.png)
 
 In der `pom.xml` wird eine neue Dependency eingefügt, um den Datenbankzugriff mit Java erst realisieren zu können. (immer die neueste Version verwenden!)
 
