@@ -11,10 +11,17 @@ Inhaltsverzeichnis
 * [JDBC Intro 2](#jdbc-intro-2)
     * [Singleton](#singleton)
     * [DAO](#dao-data-access-object)
-    * [Kurssystem grundlegend](#kurssystem-grundlegend)
-        * [Aufbau und Funktionen der Repositories](#aufbau-der-repos)
-        * [Implementierung der Funktionen]
-        * []
+    * [Objektrelationales Mapping](#objektrelationales-mapping)
+    * [CLI](#cli)
+    * [Exceptions](#exceptions)
+    * [Erben von Interfaces](#erben-von-interfaces)
+    * [Kurssystem grundlegend](#kurssystem-grundlegend-db-seitig)
+        * [Aufbau der Repositories](#aufbau-der-repos-grundlegend)
+        * [Aufbau der Repositories im Kurssystem](#aufbau-der-repos-für-kurssystem)
+    * [CRUD-Operationen](#crud-operationen)
+        * [Parametrisierung](#parametrisierung)
+        * [Optional](#optional)
+    * [Implementierung: Student und Booking + UML](#implementierung-mit-student-und-bookings-kurzbeschreibung--fertiges-uml)
 
 
 ## JDBC Intro 1
@@ -411,7 +418,7 @@ Die Domänenklassen sind dafür da, die Entitäten als Objekt abzubilden. Anzume
         * `MySQLCourseRepository`
         * `MySQLStudentRepository`
         * `MySQLBookingRepository`
-### CRUD-Operationen mit DAO-Pattern
+### CRUD-Operationen
 Die Basic-CRUD Operation (insert,select*,select by id, update, delete) sind unabhängig von der Entity gleich. 
 
 ```java
@@ -456,6 +463,7 @@ public class MySqlBookingsRepository implements MyBookingsRepository{
     `onb.ifPresentOrElse(s -> System.out.println("Inhalt vorhanden!"),getWarning());`
 
 ### Implementierung mit Student und Bookings (Kurzbeschreibung + fertiges UML)
+> Für die komplette Ausimplementierung bitte im Repository die Codeteile einsehen!
 Vorgehensweise:
 * Tabelle bookings und student erstellen
 * jeweils zwei Einträge erstellen (für Tests)
