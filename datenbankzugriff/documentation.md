@@ -1,6 +1,6 @@
 # Datenbankzugriff mit JAVA, JDBC und DAO
 
-In dieser Mitschrift werden die Schritte der Videos aufgelistet und beschrieben. 
+In dieser Mitschrift werden die wichtigsten Inhalte aus den Videos dokumentiert, sowie einige Implementierungen festgehalten.
 
 Inhaltsverzeichnis
 * [JDBC Intro 1](#jdbc-intro-1)
@@ -381,10 +381,10 @@ Interfaces können von anderen Interfaces erben. Dies wird benötigt, wenn ein I
 ### Domänenklassen
 Die Domänenklassen sind dafür da, die Entitäten als Objekt abzubilden. Anzumerken hierbei ist, dass jede Domänenklassen über 2 Konstruktor verfügt. Hierfür ist einer für Insert in die Datenbank von neuen Objekten (id==null; weil von auto increment selbst erzeugt), der andere ist für Datensätze, die bereits in der Datenbank bestehen (haben bereits ID), aus dieser geholt und als Objekt gemappt werden.
 
-* BaseEntity (abstrakte Klasse, die ID als Datenfeld hat -> jede Entity hat ID!)
-    * Booking
-    * Courses
-    * Student
+* `BaseEntity` (abstrakte Klasse, die ID als Datenfeld hat -> jede Entity hat ID!)
+    * `Booking`
+    * `Courses`
+    * `Student`
 
 ### Kurssystem grundlegend (DB-seitig)
 * DB: kurssystem
