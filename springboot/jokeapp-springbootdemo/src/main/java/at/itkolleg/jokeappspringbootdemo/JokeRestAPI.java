@@ -41,7 +41,7 @@ public class JokeRestAPI {
         return ResponseEntity.ok(jokesRepository.findAll());
     }
 
-    @DeleteMapping({"/{id}"})
+    @DeleteMapping("/{id}")
     public ResponseEntity<Joke> deleteJokeByID(@PathVariable Long id)
     {
         //Joke jokeToDelete = jokesRepository.findById(id).orElseThrow(()-> new JokeNotFoundException("This joke is not in our db")); Kurzform
