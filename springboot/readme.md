@@ -173,6 +173,14 @@ public class Joke {/**Code ausgelassen**/}
 ### Automatisch implementierte Methoden
 
 ## application.properties
+Konfigurationsdatei über die z.B. für den DB-Zugriff, Einstellungen vorgenommen werden können. 
+
+```java
+spring.datasource.url=jdbc:h2:mem:testdb
+spring.datasource.driver-class-name=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=
+```
 
 ## generated-requests.http
 
