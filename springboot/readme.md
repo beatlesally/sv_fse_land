@@ -7,7 +7,8 @@
 
 
 **Frontend**
-
+- [Thymeleaf Frontend]
+- [JS Frontend]
 
 ## Getting Started
 > Manche Funktionen für Spring Boot können **nicht** mit der Community Edition von IntelliJ genutzt werden. Es wird die Pro Version verwendet (als Student gratis).
@@ -73,7 +74,7 @@ public ResponseEntity<Joke> insertJoke(@RequestBody Joke joke)
 ```
 
 #### @RequestBody
-So wird das Mitgesendete (wie bei POST) aufgefangen und kann verwendet werden. Es wird automatisch in das Objekt gemappt (in diesem Fall `Joke`).
+So wird das Mitgesendete (wie bei POST) im Body aufgefangen und kann verwendet werden. Es wird automatisch in das Objekt gemappt (in diesem Fall `Joke`).
 
 ### @GetMapping
 ...wird für den HTTP-Request `GET` verwendet.
@@ -157,6 +158,7 @@ public class JokeRestAPI {/***/}
 public class JokeRestAPI {/***/}
 ```
 
+### @Component
 
 
 ## Lombok
@@ -184,3 +186,7 @@ spring.datasource.password=
 
 ## generated-requests.http
 
+## Studentenverwaltung
+
+Mit Ports & Adapters Architektur aufgebaut. 
+Driving und Driven Adapters

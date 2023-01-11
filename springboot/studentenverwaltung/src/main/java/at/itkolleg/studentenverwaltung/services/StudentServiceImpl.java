@@ -4,13 +4,14 @@ import at.itkolleg.studentenverwaltung.domain.Student;
 import at.itkolleg.studentenverwaltung.exceptions.StudentNotFound;
 import at.itkolleg.studentenverwaltung.repositories.DBAccessStudent;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 /**
  * Hier würde überall Business Logic verbaut sein, würden es nicht einfache CRUD Methoden sein!
  */
-@Component
+@Service
 public class StudentServiceImpl implements StudentService{
 
     private DBAccessStudent dbAccessStudent;
