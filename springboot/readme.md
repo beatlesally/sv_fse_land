@@ -128,6 +128,11 @@ Spring Boot übernimmt die Dependency Injection. Er sucht nach einer Implementie
 @Autowired
 JokesRepository jokesRepository;
 ```
+
+### @Component / @Service / @Controller / @Repository
+Mit @Component (od. andere) wird Spring gesagt, dass dies ein Custom Bean ist. Somit kann er diese Komponente automatisch injezieren. @Service / @Controller / @Repository sind nur spezialisierte Namen, bringen aber die gleichen Funktionen wie @Component.
+
+
 #### Dependency Injection
 > Als Dependency Injection [...] wird in der objektorientierten Programmierung ein Entwurfsmuster bezeichnet, welches die Abhängigkeiten eines Objekts zur Laufzeit reglementiert: Benötigt ein Objekt beispielsweise bei seiner Initialisierung ein anderes Objekt, ist diese Abhängigkeit an einem zentralen Ort hinterlegt – es wird also nicht vom initialisierten Objekt selbst erzeugt.
 > (https://de.wikipedia.org/wiki/Dependency_Injection)
@@ -146,27 +151,52 @@ public class Joke {
 ```
 
 ### @Size
-
-### @Valid & BindingResult
-
-### @ControllerAdvice
-...
+Kann die Size einer Variable festlegen. Wird ein neues Objekt erstellt und die Size entspricht nicht dem angegebenen, wird eine Exception geworfen.
 ```java
-@RequestMapping("/api/v1/jokes")
-public class JokeRestAPI {/***/}
+@Size(min = 4, max = 6) //max ist optional
+private String plz;
+```
+### @Valid & BindingResult
+Ist zu @Size auch mit der Validierung verbunden. 
+```java
+public ResponseEntity<Student> addStudent(@Valid @RequestBody Student student, BindingResult bindingResult){/***Code ausgelassen***/}
+```
+Treten bei der Validierung Fehler auf, werden diese in BindingResult gespeichert. Über dieses BindingResult kann iteriert werden.
+```java
+if(bindingResult.hasErrors()){
+    for (ObjectError error : bindingResult.getAllErrors()){
+        errors += "\n Validationerror for object: " + error.getObjectName() +
+                " in field " + ((FieldError)error).getField() +
+                " with problem " + error.getDefaultMessage();
+    }
+}
+```
+### @ControllerAdvice
+Mit dieser Annotation können Exceptions über die ganze Applikation gehandled werden. (https://medium.com/@jovannypcg/understanding-springs-controlleradvice-cd96a364033f)
+Somit ist es möglich einen zentralen Controller für das Exception Handling zu erstellen.
+```java
+@ControllerAdvice
+public class ExceptionController {/***hier sind die Methoden mit @ExceptionHandler enthalten***/}
 ```
 ### @ExceptionHandler
-Wenn eine Exception geworfen wird, springt dieser ExceptionHandler ein und führt die Methode aus.
+Ein zentraler Exception Handler kann die Exceptions der ganzen Applikation handeln; auch angepasste Nachrichten an den Benutzer im Body zurückliefern und nicht nur die Exceptionmessage am Server ausgeben. 
+Wenn eine Exception geworfen wird, springt dieser ExceptionHandler ein (systemweit) und führt die Methode aus. Hierfür muss aber für diese Exception auch ein ExceptionHandler bestehen!
 ```java
-@RequestMapping("/api/v1/jokes")
-public class JokeRestAPI {/***/}
+/**
+ * In diesem Beispiel wurde eine eigene Klasse ExceptionDTO erstellt, die
+ * zwei Datenfelder mit code und message beinhaltet.
+ */
+ @ExceptionHandler(StudentNotFound.class) //Exception für die diese Methode ausgeführt werden soll
+    public ResponseEntity<ExceptionDTO> ExcStudentNotFound(StudentNotFound studentNotFound)
+    {
+        return new ResponseEntity<>(new ExceptionDTO("1000",studentNotFound.getMessage()), HttpStatus.NOT_FOUND);
+    }
 ```
 
-### @Component
 
 
 ## Lombok
-Einfache, sich immer wiederholende Codeteile wie Getter, Setter, Konstruktor, etc. werden von Lombok erzeugt. Somit bleibt der Code übersichtlicher.
+Einfache, sich immer wiederholende Codeteile wie Getter, Setter, Konstruktor, etc. werden von Lombok erzeugt (Boilerplate). Somit bleibt der Code übersichtlicher.
 ### Getter, Setter und Konstruktor
 ```java
 @Getter //alle Getter
@@ -177,7 +207,7 @@ public class Joke {/**Code ausgelassen**/}
 ```
 
 ### Automatisch implementierte Methoden
-
+....
 ## application.properties
 Konfigurationsdatei über die z.B. für den DB-Zugriff, Einstellungen vorgenommen werden können. 
 
@@ -189,8 +219,16 @@ spring.datasource.password=
 ```
 
 ## generated-requests.http
+Hier können in IntelliJ HTTP-Request durchgeführt werden.
 
-## Studentenverwaltung
-
-Mit Ports & Adapters Architektur aufgebaut. 
+## Ports & Adapters Architektur aufgebaut. 
 Driving und Driven Adapters
+
+# Frontends
+
+swagger-ui (http://localhost:8080/swagger-ui/index.html) volle Dokumentation automatisch generiert
+
+## Frontend mit JS (Vanilla)
+
+
+## Frontend mit Thymeleaf
