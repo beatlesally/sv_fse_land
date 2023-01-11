@@ -145,6 +145,10 @@ public class Joke {
     private int usk;
 ```
 
+### @Size
+
+### @Valid & BindingResult
+
 ### @ControllerAdvice
 ...
 ```java
@@ -152,7 +156,7 @@ public class Joke {
 public class JokeRestAPI {/***/}
 ```
 ### @ExceptionHandler
-...
+Wenn eine Exception geworfen wird, springt dieser ExceptionHandler ein und führt die Methode aus.
 ```java
 @RequestMapping("/api/v1/jokes")
 public class JokeRestAPI {/***/}

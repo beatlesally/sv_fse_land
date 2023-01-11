@@ -2,9 +2,14 @@ package at.itkolleg.studentenverwaltung.controller;
 
 import at.itkolleg.studentenverwaltung.domain.Student;
 import at.itkolleg.studentenverwaltung.exceptions.StudentNotFound;
+import at.itkolleg.studentenverwaltung.exceptions.StudentValidationFailed;
 import at.itkolleg.studentenverwaltung.services.StudentService;
+import jakarta.validation.Valid;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,9 +31,19 @@ public class StudentRestController {
     }
 
     @PostMapping
-    public ResponseEntity<Student> addStudent(@RequestBody Student student)
+    public ResponseEntity<Student> addStudent(@Valid @RequestBody Student student, BindingResult bindingResult) throws StudentValidationFailed //in BindingResult Validierungserrors
     {
-        return ResponseEntity.ok(this.studentService.addStudent(student));
+        String errors = "";
+        if(bindingResult.hasErrors()){
+            for (ObjectError error : bindingResult.getAllErrors()){
+                errors += "\n Validationerror for object: " + error.getObjectName() +
+                        " in field " + ((FieldError)error).getField() +
+                        " with problem " + error.getDefaultMessage();
+            }
+            throw new StudentValidationFailed(errors);
+        } else {
+            return ResponseEntity.ok(this.studentService.addStudent(student));
+        }
     }
 
     @DeleteMapping("/{id}")
