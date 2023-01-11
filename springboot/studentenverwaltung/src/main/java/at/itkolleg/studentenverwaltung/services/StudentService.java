@@ -7,12 +7,13 @@ import java.util.List;
 
 /**
  * Service Layer für Business Logic zuständig
+ * Ähnlich zu Data Layer, jedoch wird hier geprüft, ob Student schon existiert, etc.
  */
-public interface StudentServices {
+public interface StudentService {
 
     List<Student> getAllStudents();
-    Student addStudent();
-    Student getStudentByID() throws StudentNotFound;
+    Student addStudent(Student student);
+    Student getStudentByID(Long id) throws StudentNotFound;
     List<Student> getAllStudentsFromPLZ(String plz);
     void deleteStudentbyID(Long id) throws StudentNotFound;
 

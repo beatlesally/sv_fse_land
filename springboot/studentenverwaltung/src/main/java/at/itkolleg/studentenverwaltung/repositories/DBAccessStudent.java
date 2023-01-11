@@ -8,9 +8,9 @@ import java.util.List;
 /**
  * Methoden, für die, die Datenlayer verwenden möchten, brauchen können
  */
-public interface DBConnectStudent {
+public interface DBAccessStudent {
 
-    Student studentSave(Student student);
+    Student saveStudent(Student student);
     List<Student> getAllStudents();
     List<Student> getAllStudentsFromPLZ(String plz);
     Student getStudentWithID(Long id) throws StudentNotFound;

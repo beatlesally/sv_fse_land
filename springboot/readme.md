@@ -3,7 +3,7 @@
 ## Table of Contents
 
 **Backend**
-- [Getting Started](#getting-started)
+- [Getting Started with Spring Boot](#getting-started)
 
 
 **Frontend**
@@ -38,7 +38,7 @@ Es gibt folgende Annotation:
 Mit dieser Annotation wird die Klasse als REST API markiert.
 
 ## Mappings
-Es gibt verschiedenen HTTP-Request. Mit den Mappings kann für den bestimmten Request auf die Methode gezeigt werden, die dafür verwendet/aufgerufen werden soll.
+Es gibt verschiedene HTTP-Request. Mit den Mappings kann für den bestimmten Request auf die Methode gezeigt werden, die dafür verwendet/aufgerufen werden soll.
 
 HTTP-Requests (als Code markiert, werden näher beschrieben):
 - `GET`
@@ -145,13 +145,13 @@ public class Joke {
 ```
 
 ### @ControllerAdvice
-
+...
 ```java
 @RequestMapping("/api/v1/jokes")
 public class JokeRestAPI {/***/}
 ```
 ### @ExceptionHandler
-
+...
 ```java
 @RequestMapping("/api/v1/jokes")
 public class JokeRestAPI {/***/}

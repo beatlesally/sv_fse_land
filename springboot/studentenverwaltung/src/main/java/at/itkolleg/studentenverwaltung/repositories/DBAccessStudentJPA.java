@@ -2,23 +2,23 @@ package at.itkolleg.studentenverwaltung.repositories;
 
 import at.itkolleg.studentenverwaltung.domain.Student;
 import at.itkolleg.studentenverwaltung.exceptions.StudentNotFound;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+//Als Bean annotiert
 @Component //für Dependency Injection & @Autowired; initierbare Komponente
-public class DBConnectStudentJPA implements DBConnectStudent{
+public class DBAccessStudentJPA implements DBAccessStudent {
 
     /*@Autowired*/
     private StudentJPARepo studentJPARepo;
 
-    public DBConnectStudentJPA(StudentJPARepo studentJPARepo) { //Alternative zu Autowired
+    public DBAccessStudentJPA(StudentJPARepo studentJPARepo) { //Alternative zu Autowired
         this.studentJPARepo = studentJPARepo;
     }
 
     @Override
-    public Student studentSave(Student student) {
+    public Student saveStudent(Student student) {
         return this.studentJPARepo.save(student);
     }
 
