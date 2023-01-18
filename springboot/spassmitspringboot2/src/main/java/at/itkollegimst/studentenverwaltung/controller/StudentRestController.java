@@ -16,7 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/studenten")
-@CrossOrigin(origins = "http://127.0.0.1:5500")
+@CrossOrigin(origins = "http://127.0.0.1:5500") //Browser wird signalisiert, dass :5500 erlaubt ist, sonst Fehlermeldung
 public class StudentRestController {
 
     private StudentenService studentenService;

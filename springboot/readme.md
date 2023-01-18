@@ -192,7 +192,7 @@ Wenn eine Exception geworfen wird, springt dieser ExceptionHandler ein (systemwe
         return new ResponseEntity<>(new ExceptionDTO("1000",studentNotFound.getMessage()), HttpStatus.NOT_FOUND);
     }
 ```
-
+### @CrossOrigin
 
 
 ## Lombok
