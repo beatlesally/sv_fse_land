@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <link rel="stylesheet" href="./bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="../bootstrap/bootstrap.min.css">
     
     <title>Document</title>
 </head>
@@ -14,6 +14,7 @@
         <h1>Studierende-Liste</h1>
         <hr class="border-2 border-top border-info">
         <a href="insertstudent.html" class="btn btn-info" role="button">Studierenden hinzufügen</a>
+        <a href="updatestudent.html" class="btn btn-info" role="button">Studierenden aktualisieren</a>
         <hr class="border-2 border-top border-info">
         <table class="table" id="studentTable"></table>
     </div>
@@ -32,7 +33,7 @@ async function getAllData() //asynchron
         {
             method: 'GET',
             cache : 'no-cache',
-            header: {
+            headers: {
                 'Accept':'application/json'
             }
         }

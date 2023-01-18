@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../bootstrap/bootstrap.min.css">
+    <script src="../bootstrap/jquery-3.6.3.min.js"></script>
+    <title>Studierenden hinzufügen</title>
+</head>
+<body>
+    <div class="container-fluid">
+        <h1>Studierenden hinzufügen</h1>
+        <hr class="border-2 border-top border-info">
+        <a href="allstudents.html" class="btn btn-info" role="button">zur Übersicht</a>
+        <hr class="border-2 border-top border-info">
+        <form>
+            <div class="mb-3">
+                <label for="name" class="form-label fw-semibold">NAME</label>
+                <input type="text" class="form-control" id="name" name="name">
+                <div class="form-text" id="nameError"></div> <!--nur für Fehlerausgabe-->
+            </div>
+            <div class="mb-3">
+                <label for="plz" class="form-label fw-semibold">PLZ</label>
+                <input type="text" class="form-control" id="plz" name="plz">
+                <div class="form-text" id="plzError"></div> <!--nur für Fehlerausgabe-->
+            </div>
+            <div class="mb-3">
+                <div class="form-text" id="inputresponse"></div> <!--nur für Fehlerausgabe-->
+            </div>
+        </form>
+        <button class="btn btn-warning" onclick="sendData()">Hinzufügen</button>
+
+    </div>
+</body>
+<script>
+async function sendData()
+{
+    const name= $('input[name=name]').val()
+    const plz= $('input[name=plz]').val() //jQuery
+
+    try {
+        const response = await fetch('http://localhost:8080/api/v1/studenten',
+        {
+            method: 'POST',
+            cache : 'no-cache',
+            headers: {
+                'Content-Type':'application/json',
+                'Accept':'application/json'
+            },
+            body: JSON.stringify({"name":name, "plz":plz})
+        })
+
+        const data = await response.json()
+
+        $('#nameError').html('') //Fehlermeldungen leeren
+        $('#plzError').html('')
+
+        if(data.code && data.code == 9000 && data.formValidationErrors)
+        {
+            if(data.formValidationErrors.name)
+            {
+                $('#nameError').html(data.formValidationErrors.name)
+            } 
+
+            if(data.formValidationErrors.plz)
+            {
+                $('#plzError').html(data.formValidationErrors.plz)   
+            } 
+        } else {
+            $('#nameError').html('')
+            $('#plzError').html('')
+            $('#inputresponse').html("Hinzufügen erfolgreich")
+        }
+        
+    } catch (error) {
+        alert("Fehler!")
+    }
+
+    
+
+
+    
+}
+
+</script>
+</html>
