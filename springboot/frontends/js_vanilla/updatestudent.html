@@ -40,5 +40,74 @@
 </body>
 <script>
 
+loadURLDataToForm();
+
+    function loadURLDataToForm()
+    {
+        const id = getURLParameter('id')
+        const name = getURLParameter('name')
+        const plz = getURLParameter('plz')
+
+        $('#id').val(id)
+        $('#name').val(name)
+        $('#plz').val(plz)
+    }
+    
+    function getURLParameter(name)
+    {
+        return decodeURIComponent((new RegExp('[?|&]'+name+'='+'([^&;]+?)(&|#|;|$)').exec(location.search) || [null, ''])[1].replace(/\+/g, '%20')) || null;
+    }
+
+
+async function sendData()
+{
+    const id=$('input[name=id]').val()
+    const name= $('input[name=name]').val()
+    const plz= $('input[name=plz]').val() //jQuery
+
+    try {
+        const response = await fetch('http://localhost:8080/api/v1/studenten',
+        {
+            method: 'PUT',
+            cache : 'no-cache',
+            headers: {
+                'Content-Type':'application/json',
+                'Accept':'application/json'
+            },
+            body: JSON.stringify({"id":id,"name":name, "plz":plz})
+        })
+
+        const data = await response.json()
+
+        $('#nameError').html('') //Fehlermeldungen leeren
+        $('#plzError').html('')
+        
+
+        if(data.code)
+        {
+            if(data.code == 9000 && data.formValidationErrors)
+            {
+                if(data.formValidationErrors.name)
+                {
+                    $('#nameError').html(data.formValidationErrors.name)
+                } 
+
+                if(data.formValidationErrors.plz)
+                {
+                    $('#plzError').html(data.formValidationErrors.plz)   
+                } 
+            } else if (data.code == 1000 & data.message) {
+                $('#inputresponse').html("Studierende konnte nicht aktualisiert werden")
+            }
+        } else {
+            $('#nameError').html('')
+            $('#plzError').html('')
+            $('#inputresponse').html("Aktualisierung erfolgreich")
+        }
+        
+    } catch (error) {
+        alert("Fehler!")
+    }
+}
 </script>
 </html>

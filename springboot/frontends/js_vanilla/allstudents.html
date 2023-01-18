@@ -14,7 +14,6 @@
         <h1>Studierende-Liste</h1>
         <hr class="border-2 border-top border-info">
         <a href="insertstudent.html" class="btn btn-info" role="button">Studierenden hinzufügen</a>
-        <a href="updatestudent.html" class="btn btn-info" role="button">Studierenden aktualisieren</a>
         <hr class="border-2 border-top border-info">
         <table class="table" id="studentTable"></table>
     </div>
@@ -67,7 +66,7 @@ async function getAllData() //asynchron
             id.innerHTML = student.id
             name.innerHTML = student.name
             plz.innerHTML = student.plz
-            action.innerHTML = `<button type="button" class="btn btn-warning" onclick="deleteStudent(${student.id})">Löschen</button>`
+            action.innerHTML = `<a href="updatestudent.html?id=${student.id}&name=${student.name}&plz=${student.plz}" class="btn btn-primary" role="button">bearbeiten</a> <button type="button" class="btn btn-warning" onclick="deleteStudent(${student.id})">löschen</button>`
         })
         console.log(data)
     } catch(exception) {
