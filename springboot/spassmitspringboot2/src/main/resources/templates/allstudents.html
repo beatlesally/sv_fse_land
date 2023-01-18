@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:th="http://www.thymeleaf.org"
+        lang="de">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <title>Alle Studierende</title>
+</head>
+<body>
+<div class="container-fluid">
+    <h1>Studierendeliste</h1>
+</div>
+<table class="table" id="studentTable">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>PLZ</th>
+            <th>Aktion</th>
+        </tr>
+    </thead>
+    <tbody>
+            <tr th:each="student: ${getAllStudents}"> <!--Thymeleaf foreach-->
+                <td th:text="${student.id}"></td> <!--Thymeleaf aus Element id nehmen-->
+                <td th:text="${student.name}"></td> <!--Thymeleaf!-->
+                <td th:text="${student.plz}"></td> <!--Thymeleaf!-->
+                <td>Aktion offen</td>
+            </tr>
+    </tbody>
+
+
+
+</table>
+
+</body>
+</html>
