@@ -18,6 +18,7 @@
         <table class="table" id="studentTable"></table>
     </div>
     
+    
 </body>
 
 <script>
@@ -40,8 +41,9 @@ async function getAllData() //asynchron
         const data = await response.json()
 
         const table = document.getElementById('studentTable')
-        while(table.rows[0]) table.deleteRows(0)
-
+        while(table.rows[0]) {
+            table.deleteRow(0)
+        }
         var row = table.insertRow() //Zeile einfügen
         var id = row.insertCell(0) //in Zeile Zelle einfügen
         var name = row.insertCell(1)
@@ -51,7 +53,7 @@ async function getAllData() //asynchron
         id.innerHTML = 'ID' //in Zelle HTML einfügen
         name.innerHTML = 'Name'
         plz.innerHTML = 'PLZ'
-        action.innerHTML = ''
+        action.innerHTML = 'Action!'
 
         data.forEach((student) => 
         {
@@ -64,7 +66,7 @@ async function getAllData() //asynchron
             id.innerHTML = student.id
             name.innerHTML = student.name
             plz.innerHTML = student.plz
-            action.innerHTML = ''
+            action.innerHTML = `<button type="button" class="btn btn-warning" onclick="deleteStudent(${student.id})">Löschen</button>`
         })
         console.log(data)
     } catch(exception) {
@@ -73,6 +75,29 @@ async function getAllData() //asynchron
     }
 
 }
+
+async function deleteStudent(id)
+{
+    try {
+        const response = await fetch('http://localhost:8080/api/v1/studenten/'+id, 
+        {
+            method: 'DELETE',
+            cache : 'no-cache',
+            header: {
+                'Accept':'application/json'
+            }
+        }
+        )
+
+        const data = await response.json()
+
+        getAllData() //Tabelle nochmal neu aufbauen
+
+    } catch (exception) {
+        alert("Fehler beim Löschen!")
+    }
+}
+
 </script>
 
 </html>

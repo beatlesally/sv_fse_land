@@ -23,5 +23,11 @@ public class StudentenverwaltungApplication implements ApplicationRunner {
 		this.dbZugriffStudenten.studentSpeichern(new Student("Claudio Landerer","6460"));
 		this.dbZugriffStudenten.studentSpeichern(new Student("Günter Hasel","3322"));
 		this.dbZugriffStudenten.studentSpeichern(new Student("Maria Brunsteiner","8080"));
+		this.dbZugriffStudenten.studentSpeichern(new Student("Claudio Landerer","6460"));
+		this.dbZugriffStudenten.studentSpeichern(new Student("Günter Hasel","3322"));
+		this.dbZugriffStudenten.studentSpeichern(new Student("Maria Brunsteiner","8080"));
+		this.dbZugriffStudenten.studentSpeichern(new Student("Claudio Landerer","6460"));
+		this.dbZugriffStudenten.studentSpeichern(new Student("Günter Hasel","3322"));
+		this.dbZugriffStudenten.studentSpeichern(new Student("Maria Brunsteiner","8080"));
 	}
 }
