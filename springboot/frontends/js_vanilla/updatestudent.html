@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../bootstrap/bootstrap.min.css">
+    <script src="../bootstrap/jquery-3.6.3.min.js"></script>    
+    <title>Studierenden aktualisieren</title>
+</head>
+<body>
+    <div class="container-fluid">
+        <h1>Studierenden aktualisieren</h1>
+        <hr class="border-2 border-top border-info">
+        <a href="allstudents.html" class="btn btn-info" role="button">zur Übersicht</a>
+        <hr class="border-2 border-top border-info">
+        <form>
+            <div class="mb-3">
+                <label for="id" class="form-label fw-semibold">ID</label>
+                <input type="text" class="form-control-plaintext" id="id" name="id">
+                <div class="form-text" id="idError"></div> <!--nur für Fehlerausgabe-->
+            </div>
+            <div class="mb-3">
+                <label for="name" class="form-label fw-semibold">NAME</label>
+                <input type="text" class="form-control" id="name" name="name">
+                <div class="form-text" id="nameError"></div> <!--nur für Fehlerausgabe-->
+            </div>
+            <div class="mb-3">
+                <label for="plz" class="form-label fw-semibold">PLZ</label>
+                <input type="text" class="form-control" id="plz" name="plz">
+                <div class="form-text" id="plzError"></div> <!--nur für Fehlerausgabe-->
+            </div>
+            <div class="mb-3">
+                <div class="form-text" id="inputresponse"></div> <!--nur für Fehlerausgabe-->
+            </div>
+        </form>
+        <button class="btn btn-warning" onclick="sendData()">Ändern</button>
+
+    </div>
+</body>
+<script>
+
+</script>
+</html>
