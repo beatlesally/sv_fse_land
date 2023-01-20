@@ -59,4 +59,31 @@ public class StudentThymeleafController {
             return "redirect:/web/v1/studenten";
         }
     }
+
+    @PostMapping("/update")
+    public String updateStudent(@Valid Student student, BindingResult bindingResult)
+    {
+        if(bindingResult.hasErrors())
+        {
+            return "updatestudent";
+        } else {
+            try {
+                this.studentenService.studentUpdaten(student);
+                return "redirect:/web/v1/studenten";
+            } catch (StudentNichtGefunden studentNichtGefunden){
+                return "redirect:/web/v1/studenten";
+            }
+        }
+    }
+
+    @GetMapping("/delete/{id}")
+    public String deleteStudent(@PathVariable Long id)
+    {
+        try {
+            this.studentenService.studentLoeschenMitId(id);
+            return "redirect:/web/v1/studenten";
+        } catch (StudentNichtGefunden studentNichtGefunden){
+            return "redirect:/web/v1/studenten";
+        }
+    }
 }

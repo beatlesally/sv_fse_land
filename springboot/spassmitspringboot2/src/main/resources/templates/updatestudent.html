@@ -10,13 +10,18 @@
 </head>
 <body>
 <div class="container-fluid">
-  <h1>Studierende einfügen</h1>
+  <h1>Studierende updaten</h1>
   <hr class="border-2 border-top border-info">
   <a th:href="@{/web/v1/studenten}" class="btn btn-info" role="button">zur Übersicht</a>
   <hr class="border-2 border-top border-info">
 
-<form th:object="${student}" th:action="@{/web/v1/studenten/insert}" method="POST"> <!--Basisobjekt holen für Weiterarbeiten, @ = Serverpfad-->
+<form th:object="${student}" th:action="@{/web/v1/studenten/update}" method="POST"> <!--Basisobjekt holen für Weiterarbeiten, @ = Serverpfad-->
   <!--th object gültig für das gesamte formular-->
+  <div class="m-md-3">
+    <label for name="id" class="form-label">ID</label>
+    <input type="text" class="form-control" id="id" name="id" th:field="*{id}" readonly> <!--* = auf Studentenobjekt zuzugreifen, name muss mit Datenfeld zu passen-->
+  </div>
+
   <div class="m-md-3">
     <label for name="name" class="form-label">Name</label>
     <input type="text" class="form-control" id="name" name="name" th:field="*{name}"> <!--* = auf Studentenobjekt zuzugreifen, name muss mit Datenfeld zu passen-->
@@ -29,7 +34,7 @@
     <div class="form-text" th:if="${#fields.hasErrors('plz')}" th:errorclass="error" th:errors="*{plz}"></div>
   </div>
 
-  <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Speichern</button>
+  <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Update</button>
 
 </form>
 </div>
