@@ -7,8 +7,9 @@
 
 
 **Frontend**
-- [Thymeleaf Frontend]
-- [JS Frontend]
+- [JS Frontend](#frontend-mit-js-vanilla)
+- [Thymeleaf Frontend](#frontend-mit-thymeleaf)
+
 
 ## Getting Started
 > Manche Funktionen für Spring Boot können **nicht** mit der Community Edition von IntelliJ genutzt werden. Es wird die Pro Version verwendet (als Student gratis).
@@ -35,8 +36,7 @@ Es gibt folgende Annotation:
 ## REST-API
 ...
 
-### @RestController
-Mit dieser Annotation wird die Klasse als REST API markiert.
+
 
 ## Mappings
 Es gibt verschiedene HTTP-Request. Mit den Mappings kann für den bestimmten Request auf die Methode gezeigt werden, die dafür verwendet/aufgerufen werden soll.
@@ -132,13 +132,15 @@ JokesRepository jokesRepository;
 ### @Component / @Service / @Controller / @Repository
 Mit @Component (od. andere) wird Spring gesagt, dass dies ein Custom Bean ist. Somit kann er diese Komponente automatisch injezieren. @Service / @Controller / @Repository sind nur spezialisierte Namen, bringen aber die gleichen Funktionen wie @Component.
 
+### @RestController
+Ist eine Kombination von @Controller und @ResponseBody. 
 
 #### Dependency Injection
 > Als Dependency Injection [...] wird in der objektorientierten Programmierung ein Entwurfsmuster bezeichnet, welches die Abhängigkeiten eines Objekts zur Laufzeit reglementiert: Benötigt ein Objekt beispielsweise bei seiner Initialisierung ein anderes Objekt, ist diese Abhängigkeit an einem zentralen Ort hinterlegt – es wird also nicht vom initialisierten Objekt selbst erzeugt.
 > (https://de.wikipedia.org/wiki/Dependency_Injection)
 
 ### @Entity
-Weil wird die h2-DB verwendet haben, wird mit Entity automatisch eine Entität in der DB erzeugt.
+Ist für das objektrelationale Mapping. Mappt einen Datensatz automatisiert in ein Objekt.
 ```java
 @Entity 
 public class Joke {
@@ -151,7 +153,7 @@ public class Joke {
 ```
 
 ### @Size
-Kann die Size einer Variable festlegen. Wird ein neues Objekt erstellt und die Size entspricht nicht dem angegebenen, wird eine Exception geworfen.
+Kann die Size einer Variable festlegen. Wird ein neues Objekt erstellt und die Size entspricht nicht dem angegebenen, wird eine Fehler geworfen.
 ```java
 @Size(min = 4, max = 6) //max ist optional
 private String plz;
@@ -179,7 +181,7 @@ Somit ist es möglich einen zentralen Controller für das Exception Handling zu 
 public class ExceptionController {/***hier sind die Methoden mit @ExceptionHandler enthalten***/}
 ```
 ### @ExceptionHandler
-Ein zentraler Exception Handler kann die Exceptions der ganzen Applikation handeln; auch angepasste Nachrichten an den Benutzer im Body zurückliefern und nicht nur die Exceptionmessage am Server ausgeben. 
+Ein zentraler Exception Handler können alle Exceptions der Applikation handeln; auch angepasste Nachrichten an den Benutzer im Body zurückliefern und nicht nur die Exceptionmessage am Server ausgeben. 
 Wenn eine Exception geworfen wird, springt dieser ExceptionHandler ein (systemweit) und führt die Methode aus. Hierfür muss aber für diese Exception auch ein ExceptionHandler bestehen!
 ```java
 /**
@@ -192,8 +194,15 @@ Wenn eine Exception geworfen wird, springt dieser ExceptionHandler ein (systemwe
         return new ResponseEntity<>(new ExceptionDTO("1000",studentNotFound.getMessage()), HttpStatus.NOT_FOUND);
     }
 ```
-### @CrossOrigin
 
+### DTO
+Ein Data-Transfer-Object ist ein Entwurfsmuster in der Softwareentwicklung. Somit können mehrere Daten gebündet zwischen Prozessen und mit nur einem Programmaufruf übertragen werden. (https://en.wikipedia.org/wiki/Data_transfer_object & https://de.wikipedia.org/wiki/Transferobjekt)
+
+### @CrossOrigin
+Somit wird dem Browser signalisiert, dass :5500 für HTTP-Requests erlaubt ist, sonst gibt es eine Fehlermeldung im Browser und die Webseite kann nicht angezeigt werden.
+```java
+@CrossOrigin(origins = "http://127.0.0.1:5500")
+```
 
 ## Lombok
 Einfache, sich immer wiederholende Codeteile wie Getter, Setter, Konstruktor, etc. werden von Lombok erzeugt (Boilerplate). Somit bleibt der Code übersichtlicher.
@@ -207,9 +216,10 @@ public class Joke {/**Code ausgelassen**/}
 ```
 
 ### Automatisch implementierte Methoden
-....
+Mit bestimmten Bezeichnungen von Methoden kann Spring Boot die Funktion automatisch ausprogrammieren.
+
 ## application.properties
-Konfigurationsdatei über die z.B. für den DB-Zugriff, Einstellungen vorgenommen werden können. 
+Konfigurationsdatei über die z.B. für den DB-Zugriff Einstellungen vorgenommen werden können. 
 
 ```java
 spring.datasource.url=jdbc:h2:mem:testdb
@@ -221,14 +231,157 @@ spring.datasource.password=
 ## generated-requests.http
 Hier können in IntelliJ HTTP-Request durchgeführt werden.
 
-## Ports & Adapters Architektur aufgebaut. 
-Driving und Driven Adapters
+## Ports & Adapters Architektur
+![Ports & Adapters Architektur](img/Screenshot%202023-01-11%20090901.png)
+
+## Dokumentation
+Mit Swagger-UI kann eine volle Dokumentation automatisch generiert werden. Diese kann abgerufen werden über: (http://localhost:8080/swagger-ui/index.html)
 
 # Frontends
-
-swagger-ui (http://localhost:8080/swagger-ui/index.html) volle Dokumentation automatisch generiert
+Das Frontend dient der Benutzerinteraktion. Es gibt mehrere Möglichkeiten, wie das Frontend mit dem Backend kommuniziert. Entweder das Frontend ist komplett losgelöst vom Backend oder direkt am Backend angebracht.
+- JS: Frontend separat zum Backend
+- Thymeleaf: Frontend und Backend zusammen
 
 ## Frontend mit JS (Vanilla)
+In JS wird mit asynchronen Aufrufen gearbeitet und über JS die Inhalte der Webseite aufgebaut.
 
+```js
+//GET Request
+async function getAll(){
+ try {
+        const response = await fetch('http://localhost:8080/api/v1/studenten',  //URL für die Anfrage
+        {
+            method: 'GET', //HTTP-Request Methode
+            cache : 'no-cache',
+            headers: {
+                'Accept':'application/json'
+            }
+        }
+        )
+
+        const data = await response.json() //Antwort der Anfrage in JSON umwandeln
+
+        /****/
+
+         data.forEach((student) => 
+        {
+            var row = table.insertRow()
+            var id = row.insertCell(0)
+            var name = row.insertCell(1)
+            var plz = row.insertCell(2)
+            var action = row.insertCell(3)
+
+            id.innerHTML = student.id
+            name.innerHTML = student.name
+            plz.innerHTML = student.plz
+            action.innerHTML = `<a href="updatestudent.html?id=${student.id}&name=${student.name}&plz=${student.plz}" class="btn btn-primary" role="button">bearbeiten</a> <button type="button" class="btn btn-warning" onclick="deleteStudent(${student.id})">löschen</button>`
+        })
+
+        /***/ 
+}
+
+//POST-Request
+async function sendData()
+{
+    const name= $('input[name=name]').val()
+    const plz= $('input[name=plz]').val() //jQuery - Daten aus input-Felder holen
+
+    try {
+        const response = await fetch('http://localhost:8080/api/v1/studenten',
+        {
+            method: 'POST',
+            cache : 'no-cache',
+            headers: {
+                'Content-Type':'application/json',
+                'Accept':'application/json'
+            },
+            body: JSON.stringify({"name":name, "plz":plz})
+        })
+
+        const data = await response.json()
+        /***/
+```
 
 ## Frontend mit Thymeleaf
+Für Thymeleaf wird eine Dependency in der pom.xml eingefügt. 
+```xml
+<dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+</dependency>
+```
+Um mit Thymeleaf die HTTP-Request verarbeiten zu können, wird ein eigener Controller erstellt. Thymeleaf arbeitet nicht mit dem RestController, weil als Rückgabe ein String (Name der html-Datei) erwartet wird. 
+
+Es wird wie im Restcontroller mit dem Servicelayer gearbeitet!
+
+### Get Request
+```java
+@GetMapping
+public String getAllStudents(Model model) //Model wird durch Injektion erstellt
+{
+    model.addAttribute("getAllStudents", this.studentenService.alleStudenten()); //attributeName == über das kann aufgerufen werden
+    return "allstudents"; //muss gleich wie Filename sein! //dieses HTML file wird bei Get zurückgegeben
+}
+```
+```html
+<tbody>
+    <tr th:each="student: ${getAllStudents}"> <!--Thymeleaf foreach mit model attribute-->
+        <td th:text="${student.id}"></td> <!--aus Element id nehmen-->
+        <td th:text="${student.name}"></td> 
+        <td th:text="${student.plz}"></td> 
+        <td>
+            <a th:href="@{/web/v1/studenten/update/{id}(id=${student.id})}" class="btn btn-secondary" role="button">Update</a>
+            <a th:href="@{/web/v1/studenten/delete/{id}(id=${student.id})}" class="btn btn-warning" role="button">Delete</a> <!--verlinken-->
+        </td>
+    </tr>
+</tbody>
+```
+
+
+### Einfügen bzw Ändern von Daten
+```java
+//wir beim Aufruf der URL aufgerufen
+@GetMapping("/insert")
+public String addStudentForm(Model model)
+{
+    Student student = new Student();
+    model.addAttribute("student", student); //leeres Studentenobjekt wird übergeben zu weiteren Befüllung
+    return "addstudent";
+}
+
+//beim Drücken auf den Button wird Post abgesetzt mit eingefügten Inhalt
+@PostMapping("/insert")
+public String addStudent(@Valid Student student, BindingResult bindingResult) //wenn mit @Valid Probleme (Validierungsprobelem), in BindingResult gespeichert
+{
+    if(bindingResult.hasErrors())
+    {
+        return "addstudent";
+    } else {
+        this.studentenService.studentEinfuegen(student);
+        return "redirect:/web/v1/studenten"; //redirect auf studentenliste
+    }
+}
+```
+```html
+<!--Code ausgelassen-->
+
+<form th:object="${student}" th:action="@{/web/v1/studenten/insert}" method="POST"> <!--Basisobjekt holen für Weiterarbeiten, @ = Serverpfad-->
+  <!--th object gültig für das gesamte formular-->
+  <div class="m-md-3">
+    <label for name="name" class="form-label">Name</label>
+    <input type="text" class="form-control" id="name" name="name" th:field="*{name}"> <!--* = auf Studentenobjekt zuzugreifen, name muss mit Datenfeld zusammenpassen-->
+    <div class="form-text" th:if="${#fields.hasErrors('name')}" th:errorclass="error" th:errors="*{name}"></div>  <!--wenn Fehler bei @Valid auftreten, werden sie hier angezeigt-->
+  </div>
+
+  <div class="m-md-3">
+    <label for name="plz" class="form-label">Plz</label>
+    <input type="text" class="form-control" id="plz" name="plz" th:field="*{plz}"> <!--* = auf Studentenobjekt zuzugreifen-->
+    <div class="form-text" th:if="${#fields.hasErrors('plz')}" th:errorclass="error" th:errors="*{plz}"></div>
+  </div>
+
+  <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Speichern</button>
+
+</form>
+
+<!--Code ausgelassen-->
+```
