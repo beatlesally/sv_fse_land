@@ -4,12 +4,44 @@
 
 **Backend**
 - [Getting Started with Spring Boot](#getting-started)
+    - [Spring Boot in IntelliJ](#spring-boot-project-in-intellij-erzeugen)
+    - [Spring Bott mit Starter](#spring-boot-project-mit-starter)
+    - [Verwendete Technologien](#verwendete-technologien)
+        - [Annotation und die Möglichkeiten](#annotation-und-die-möglichkeiten)
+- [REST-API](#rest-api)
+- [Mappings](#mappings)
+    - [@RequestMapping](#requestmapping)
+    - [@PostMapping](#postmapping)
+        - [@RequestBody](#requestbody)
+    - [@GetMapping](#getmapping)
+    - [@DeleteMapping](#deletemapping)
+        - [@PathVariable](#pathvariable)
+    - [@Autowired](#autowired)
+    - [@Component / @Service / @Controller / @Repository](#component--service--controller--repository)
+    - [@RestController](#restcontroller)
+        - [Dependency Injection](#dependency-injection)
+    - [@Entity](#entity)
+    - [@Size](#size)
+    - [@Valid & BindingResult](#valid--bindingresult)
+    - [@ControllerAdvice](#controlleradvice)
+    - [@ExceptionHandler](#exceptionhandler)
+    - [DTO](#dto)
+    - [@CrossOrigin](#crossorigin)
+- [Lombok](#lombok)
+    - [Getter, Setter und Konstruktor](#getter-setter-und-konstruktor)
+    - [Automatisch implementierte Methoden](#automatisch-implementierte-methoden)
+- [application.properties](#applicationproperties)
+- [generated-requests.http](#generated-requestshttp)
+- [Ports & Adapters Architektur](#ports--adapters-architektur)
+- [Dokumentation](#dokumentation)
 
+**Frontends**
+- [Frontend mit JS (Vanilla)](#frontend-mit-js-vanilla)
+- [Frontend mit Thymeleaf](#frontend-mit-thymeleaf)
+    - [Get Request](#get-request)
+    - [Einfügen bzw Ändern von Daten](#einfügen-bzw-ändern-von-daten)
 
-**Frontend**
-- [JS Frontend](#frontend-mit-js-vanilla)
-- [Thymeleaf Frontend](#frontend-mit-thymeleaf)
-
+---
 
 ## Getting Started
 > Manche Funktionen für Spring Boot können **nicht** mit der Community Edition von IntelliJ genutzt werden. Es wird die Pro Version verwendet (als Student gratis).
