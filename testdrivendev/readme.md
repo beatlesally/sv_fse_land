@@ -217,4 +217,5 @@ Und noch eine Frage: wie kann eine KI beim automatischen Testen von Software hil
 - KI muss vorher trainiert werden
 - Sie kann Tests rund um die Uhr überwachen und eingreifen wenn nötig
 - Erkennt Änderungen im Code (z.B. andere Name des Datenfeld) und kann Tests an diese Änderungen anpassen
+
 https://arinnau.com/2022/11/07/ki-testautomatisierung-was-bedeutet-kuenstliche-intelligenz-bei-softwaretests/
