@@ -8,7 +8,7 @@ Klassendiagramme erstellen lassen
 einige Codeteile in Doku und beschreiben
 bei DDD nur taktische Muster, 
   
-### Teil 1  
+# Teil 1  
 - Theorie: Recherchiere zu folgenden Fragestellungen und fasse deine Erkenntnisse übersichtlich und illustrativ zusammen!
     - Was ist Sofwarearchitektur?
 
@@ -95,19 +95,272 @@ bei DDD nur taktische Muster,
         - Mitschrift aus Unterricht: Service, Repositories, Aggregates (haben Zustand, der ein, mehrere Entitys oder Value Objects betrifft; Bsp. Bestellung ist Aggregat)
         https://leanpub.com/ddd-referenz/read
 
-- Abgabe der Architekturanalyse des bestehenden erplite-Backends (erplite2-main-2)
+## Abgabe der Architekturanalyse des bestehenden erplite-Backends (erplite2-main-2)
 ![Alt text](pics/erplite-main2-sequencediagramm.png)
-    - Dokumentation (texthelle Beschreibung, Codeauszüge, C4-Diagramme, Klassendiagramme) der Ports-Und-Adapters-Architektur und der DDD-Bestandteile (taktische Muster) von Ordermanagement anhand der gegebenen Anwendungsfälle, die schon implementiert sind:
-        - Bestellung aufgeben
-        - Bestellung auf bezahlt setzen
-        - Packliste generieren
-        - Packlistenitems abhaken
-        - Bestellung auf IN_DELIVERY setzen wenn alle Packlistenitems gepackt sind
-    - Wo findet man DDD-Bestandteile?
-    - Wo findet man Ports-Und-Adapters-Architektur?
-    - Dokumentation (texthelle Beschreibung, Codeauszüge, Diagramme, C4-Diagramme, Klassendiagramme) der "Architektur" von Stockmanagement anhand der gegebenen Anwendungsfälle, die schon implementiert sind:
-        - Packingliste anlegen
-        - Packingitems als verpackt markieren
+
+Dokumentation (texthelle Beschreibung, Codeauszüge, C4-Diagramme, Klassendiagramme) der Ports-Und-Adapters-Architektur und der DDD-Bestandteile (taktische Muster) von Ordermanagement anhand der gegebenen Anwendungsfälle, die schon implementiert sind:
+### Bestellung aufgeben
+über den Rest-Controller wird ein POST auf orders gemacht                                              
+```java
+//OrderRestController.java
+//der JSON wird als PlaceOrderCommand übergeben
+//ein PlaceOrderCommand wird benötigt, dass alle wissen, wie so ein Order aussehen muss, ohne Abhängigkeiten zu Ordermanagement herzustellen
+@PostMapping("/orders/")
+public ResponseEntity placeNewOrder(@RequestBody @Valid PlaceOrderCommand placeOrderCommand, BindingResult bindingResult) {
+    Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Handling place new order api request ...");
+
+    HashMap<String, String> errors = new HashMap<>();
+
+    if (bindingResult.hasErrors()) {
+        Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Errors in placeOrderCommand detected!");
+        for (FieldError fieldError : bindingResult.getFieldErrors()) {
+            errors.put(fieldError.getField(), fieldError.getDefaultMessage());
+        }
+        throw new OrderPlacedFieldValidationException("Validation errors for order placement!", errors);
+    }
+
+    //über Servicelayer wird das neue Order in handle gemappt mit den richtigen Typen und ein Order gebaut
+    OrderResponse orderResponse = orderCommandService.handle(placeOrderCommand);
+
+    String resourceLocation = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString() + "/orders/" + orderResponse.orderID();
+    try {
+        //GET Request mit OrderID aus OrderResponse
+        //Ergebnis wird an den aufrufenden Client zurückgesendet
+        return ResponseEntity.created(new URI(resourceLocation)).body(orderResponse);
+    } catch (URISyntaxException e) {
+        return ResponseEntity.noContent().build();
+    }
+}
+```  
+```java
+//OrderCommandServiceImpl.java
+@Transactional
+public OrderResponse handle(PlaceOrderCommand placeOrderCommand) {
+    /**Code ausgelassen**/
+    //LineItems von CartItem aus PlaceOrderCommand erstellen
+    List<LineItem> lineItemList = new ArrayList<>();
+    int i = 1;
+    for (CartItem cartItem : placeOrderCommand.cartItems()) {
+        lineItemList.add(new LineItem(
+                        new OrderPosition(i),
+                        new ProductNumber(cartItem.productNumber()),
+                        new Name(cartItem.productName()),
+                        new MonetaryAmount(new BigDecimal(cartItem.priceNet())),
+                        new Percentage(cartItem.tax()),
+                        new Amount(cartItem.amount())
+                )
+        );
+        i++;
+    }
+
+    //Order aus PlaceOrderCommand bauen
+    Order orderToInsert = new Order(
+            new OrderID("ONR" + UUID.randomUUID().toString().substring(0, 7)),
+            new CustomerData(
+                    new CustomerID(placeOrderCommand.customerID()),
+                    new Name(placeOrderCommand.customerFirstname()),
+                    new Name(placeOrderCommand.customerLastname()),
+                    new Email(placeOrderCommand.customerEmail()),
+                    placeOrderCommand.customerStreet(),
+                    placeOrderCommand.customerZipcode(),
+                    placeOrderCommand.customerCity(),
+                    placeOrderCommand.customerCountry()
+            ),
+            LocalDateTime.now(),
+            lineItemList,
+            OrderState.PLACED
+    );
+
+    //über das Repository wird das Order eingefügt und bekommt die fertige Order als Optional zurück
+    Optional<Order> orderOptional = this.orderRepository.insert(orderToInsert);
+
+    if (orderOptional.isPresent()) {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Publishing order placed domain event ...");
+        //Event wird getriggert (über Port OrderOutgoingMessageRelay), dass Order erstellt wurde und auch der Inhalt der Order wird ausgegeben
+        orderOutgoingMessageRelay.publish(new OrderPlacedEvent(OrderResponseMapper.toResponseFromDomain(orderOptional.get())));
+        //aus Order wird eine OrderResponse gemappt, diese an den aufrufenden REST-Controller zurückgeliefert
+        return OrderResponseMapper.toResponseFromDomain(orderOptional.get());
+    } else {
+        throw new OrderPlacementNotSuccessfullException("OrderQueryServiceImpl: Order could not be placed!");
+    }
+}
+``` 
+### Bestellung auf bezahlt setzen
+```java
+//OrderRestController.java
+
+//im Rest-Controller wird auf checkPayment mit OrderID
+@PostMapping("/orders/checkpayment/{orderid}")
+public ResponseEntity validatePaymentForOrderWithId(@PathVariable String orderid) {
+    Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Handling check payment for order api request ...");
+
+    //über Servicelayer wird an handle als OrderPaymentCheckCommand übergeben
+    this.orderCommandService.handle(new OrderPaymentCheckCommand(orderid));
+    //aufrufender Client bekommt ein Accepted zurück
+    return ResponseEntity.accepted().body("Order payment check executed. Order payment ok!");
+}
+```
+```java
+@Override
+@Transactional
+public void handle(OrderPaymentCheckCommand orderPaymentCheckCommand) throws OrderPaymentCheckFailedException {
+    /**Code ausgelassen**/
+    //Order über Repository aus DB holen mit OrderID
+    Optional<Order> optionalOrderToCheck = this.orderRepository.getById(new OrderID(orderPaymentCheckCommand.orderID()));
+    if (optionalOrderToCheck.isPresent()) {
+        //Order aus dem Optional holen
+        Order order = optionalOrderToCheck.get();
+        try { //versuchen, den State zu verändern
+            order.orderStateTransitionTo(OrderState.PAYMENT_VERIFIED);
+            //State auch in der DB aktualisieren
+            this.orderRepository.updateOrderWithNewState(order);
+            //Event getriggert, dass Payment verifiziert ist, mit OrderResponseMapper in OrderResponse mappen
+            this.orderOutgoingMessageRelay.publish(new OrderPaymentValidatedEvent(OrderResponseMapper.toResponseFromDomain(order)));
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Payment validated event published!");
+        } catch (OrderStateChangeNotPossibleException orderStateChangeNotPossibleException) {
+            throw new OrderPaymentCheckFailedException("Order payment check not possible. Order in wrong state! " + orderStateChangeNotPossibleException.getMessage());
+        }
+    } else {
+        throw new OrderPaymentCheckFailedException("Order with Id " + orderPaymentCheckCommand.orderID() + " not found for payment check!");
+    }
+}
+```
+### Packliste generieren
+```java
+//PackingRestController.java
+//Packing List für ein spezielles Order abrufen
+@GetMapping("/packings/whithorderid/{ordernr}")
+public ResponseEntity<Packing> getPackingByOrderNr(@PathVariable String ordernr) {
+    //über Repository werden die PackingItems geholt und in Packing in Liste eingefügt
+    Packing p = this.packingRepository.findByOrderId(ordernr);
+    if (p != null) {
+        return ResponseEntity.ok(p);
+    } else {
+        return ResponseEntity.notFound().build();
+    }
+}
+```
+```java
+//StockIncomingMessageHandler.java
+//wenn Payment Verifizierung erfolgreich, wird Event von OrderOutgoingSpringMessageRelayImpl veröffentlicht
+//diese wird von StockIncomingMessageHandler erkannt und erstellt dann ein Packing und die PackingItemList
+public void onApplicationEvent(OrderPaymentValidatedSpringEvent event) {
+Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Handling order payment validated spring event ...");
+
+//aus dem Event die OrderResponse holen
+OrderResponse orderResponse = event.getOrderResponse();
+
+//leeres Packing erstellen
+Packing packingToSaveToDb =
+        Packing.builder()
+                .id(null)
+                .orderId(orderResponse.orderID())
+                .deliveryData(new DeliveryData(
+                                orderResponse.customerFirstname() + " " + orderResponse.customerLastname(),
+                                orderResponse.customerStreet(),
+                                orderResponse.customerZipcode(),
+                                orderResponse.customerCity(),
+                                orderResponse.customerCountry()
+                        )
+                ).packingItemList(null) // List is generated down under
+                .build();
+
+//PackingItemList in leerem Packing mit den Werten aus OrderResponse befüllen
+List<PackingItem> packingItemList = new ArrayList<>();
+for (LineItemResponse lineItemResponse : orderResponse.orderLineItems()) {
+    packingItemList.add(
+            new PackingItem(
+                    null,
+                    lineItemResponse.productNumber(),
+                    lineItemResponse.productName(),
+                    lineItemResponse.amount(),
+                    false,
+                    packingToSaveToDb
+            )
+    );
+}
+//PackingItemList setzen
+packingToSaveToDb.setPackingItemList(packingItemList);
+//Packing über Repository speichern
+this.packingRepository.save(packingToSaveToDb);
+Logger.getLogger(this.getClass().getName()).log(Level.INFO, "New packing list created and saved in db ...");
+}
+```
+### Packlistenitems abhaken
+```java
+//PackingRestController.java
+//Über PackingItemId wird PackingItem in Packing als verpackt gesetzt
+@PostMapping("/setPackedForPacking/{packingItemId}")
+public void setPackingItemPackedForPacking(@PathVariable Long packingItemId) {
+Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Handling packing for item# " + packingItemId);
+
+//PackingItem mit Repository herausholen
+Optional<PackingItem> optionalPackingItem = this.packingItemRepository.findById(packingItemId);
+if (optionalPackingItem.isPresent()) {
+    PackingItem packingItem = optionalPackingItem.get();
+    //Packed auf true setzen
+    packingItem.setPacked(true);
+    //PackingItem über Repository wieder speichern
+    packingItemRepository.save(packingItem);
+
+    
+    Long packingId = packingItem.getPacking().getId();
+    //Packing des PackingItem holen
+    Optional<Packing> packing = this.packingRepository.findById(packingId);
+
+    boolean allpaked = true;
+    for (PackingItem item : packing.get().getPackingItemList()) { //alle PackingItems prüfen, ob sie packed sind
+        if (!item.isPacked()) allpaked = false;
+    }
+
+    if (allpaked) {//wenn alle verpackt sind
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "All items for order# " + packing.get().getOrderId() + "packed. Publishing event ...");
+        this.stockMessagePublisher.publishOrderPackedSpringEventForOrderId(packing.get().getOrderId()); //Event (OrderPackedEvent) veröffentlichen, dass Packing fertig ist
+    }
+}
+}
+```
+### Bestellung auf IN_DELIVERY setzen wenn alle Packlistenitems gepackt sind
+```java
+//Event OrderPackedEvent wurde veröffentlicht und triggert nun diesen Methodenaufruf
+@Transactional
+public void handle(OrderPackedEvent orderPackedEvent) {
+    //Meterialize object into Memory, place changes, and forward the domain object to repository
+    //this ensures, that businesslogic will be executed und object is in consistent state.
+    Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Handling order packed event ...");
+
+    //Über Repository die Order holen, OrderID aus OrderPackedEvent bekommen
+    Optional<Order> optionalOrderToCheck = this.orderRepository.getById(orderPackedEvent.orderId());
+    if (optionalOrderToCheck.isPresent()) {
+        Order order = optionalOrderToCheck.get();
+        try {
+
+            //State der Order auf PREAPRING_FOR_DELIVERY
+            order.orderStateTransitionTo(OrderState.PREPARING_FOR_DELIVERY);
+            //Order updaten
+            this.orderRepository.updateOrderWithNewState(order);
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Order state changed to preparing_for_delivery, changed order persisted!");
+        } catch (OrderStateChangeNotPossibleException orderStateChangeNotPossibleException) {
+            throw new OrderPaymentCheckFailedException("Order state change to preparing for delivery not possible! " + orderStateChangeNotPossibleException.getMessage());
+        }
+    } else {
+        throw new OrderWithGivenIDNotFoundException("Order with Id " + orderPackedEvent.orderId().id() + " not found for state change to preparing for delivery!");
+    }
+
+}
+```
+
+### Wo findet man DDD-Bestandteile?
+in Ordermanagement
+Value Objects:
+Aggregates:
+Repositories:
+Events zwischen Aggregate:
+### Wo findet man Ports-Und-Adapters-Architektur?
+
+## Dokumentation (texthelle Beschreibung, Codeauszüge, Diagramme, C4-Diagramme, Klassendiagramme) der "Architektur" von Stockmanagement anhand der gegebenen Anwendungsfälle, die schon implementiert sind:
+### Packingliste anlegen
+### Packingitems als verpackt markieren
 
 
 ### Teil 3
