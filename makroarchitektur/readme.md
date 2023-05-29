@@ -1,13 +1,3 @@
-Mitschrift
-
-geht um Softwarearchitektur
-wie baut man robuste, skalierbare Softwaresysteme
-Ordermanagement ist in Ports and Adapters
-Stockmanagement ist schlanker
-Klassendiagramme erstellen lassen
-einige Codeteile in Doku und beschreiben
-bei DDD nur taktische Muster, 
-  
 # Teil 1  
 - Theorie: Recherchiere zu folgenden Fragestellungen und fasse deine Erkenntnisse übersichtlich und illustrativ zusammen!
     - Was ist Sofwarearchitektur?
@@ -30,6 +20,13 @@ bei DDD nur taktische Muster,
         - Canonical Model Structure
 
     - Welches sind die wichtigsten Eigenschaften von Langlebigen Softwarearchitekturen (Lilienthal)
+        - **Entwurf nach Zuständigkeit**: Sind die Bausteine eines Systems modular gestaltet, so sollte man für jeden Baustein die Frage beantworten können: Was ist sein Aufgabe? Der entscheidende Punkt dabei ist, dass der Baustein wirklich eine Aufgabe hat und nicht mehrere. Diese Frage ist natürlich nur im fachlichen Kontext des jeweiligen Systems gemeinsam mit dem Entwicklerteam zu klären. Anhaltspunkte bei der Suche nach Bausteinen mit unklarer Zuständigkeit sind:
+        - Der Name des Bausteins – der Name sollte seine Aufgabe beschreiben. Ist der Name schwammig, so sollte man ihn sich ansehen.
+        - Seine Größe (s. nächster Punkt).
+        - Der Umfang seiner Kopplung mit anderen Bausteinen – wird ein Baustein sehr viel von allen möglichen anderen Bausteinen verwendet, so liegt die Vermutung nahe, dass er ein Sammelbecken von vielfältigen nicht unbedingt zusammenhängenden Funktionalitäten ist.
+        - Seine mangelnde Musterkonsistenz.
+        - **Ausgewogene Größenverhältnisse**: Bausteine, die auf einer Ebene liegen, also die Schichten, die fachlichen Module, die Packages, die Klassen oder die Methoden, sollten untereinander ausgewogene Größenverhältnisse haben. Hier lohnt es sich, die sehr großen Bausteine zu untersuchen, um festzustellen, ob sie Kandidaten für eine Zerlegung sind.
+        - **Zusammengehörigkeit durch Kopplung untereinander** : Bausteine sollten Subbausteine enthalten, die zusammengehören. Eine Klasse sollte beispielsweise Methoden enthalten, die gemeinsam ein Ganzes ergeben. Dasselbe gilt für größere Bausteine, wie Packages, Komponenten, Module und Schichten. Haben die Subbausteine mehr mit anderen Bausteinen zu tun, als mit ihren "Schwestern und Brüdern", dann stellt sich die Frage, ob sie nicht eigentlich in einen anderen Baustein gehören.
 
     - Was ist ein Modulith?
         
@@ -100,7 +97,8 @@ bei DDD nur taktische Muster,
 
 Dokumentation (texthelle Beschreibung, Codeauszüge, C4-Diagramme, Klassendiagramme) der Ports-Und-Adapters-Architektur und der DDD-Bestandteile (taktische Muster) von Ordermanagement anhand der gegebenen Anwendungsfälle, die schon implementiert sind:
 ### Bestellung aufgeben
-über den Rest-Controller wird ein POST auf orders gemacht                                              
+über den Rest-Controller wird ein POST auf orders gemacht   
+![Alt text](pics/Screenshot%202023-05-24%20084616.png)                                 
 ```java
 //OrderRestController.java
 //der JSON wird als PlaceOrderCommand übergeben
@@ -186,6 +184,8 @@ public OrderResponse handle(PlaceOrderCommand placeOrderCommand) {
 }
 ``` 
 ### Bestellung auf bezahlt setzen
+![Alt text](pics/Screenshot%202023-05-24%20094430.png)
+![Alt text](pics/Screenshot%202023-05-24%20094456.png)
 ```java
 //OrderRestController.java
 
@@ -226,6 +226,10 @@ public void handle(OrderPaymentCheckCommand orderPaymentCheckCommand) throws Ord
 }
 ```
 ### Packliste generieren
+![Alt text](pics/Screenshot%202023-05-24%20094732.png)
+![Alt text](pics/Screenshot%202023-05-24%20101052.png)
+![Alt text](pics/Screenshot%202023-05-24%20101106.png)
+![Alt text](pics/Screenshot%202023-05-24%20101151.png)
 ```java
 //PackingRestController.java
 //Packing List für ein spezielles Order abrufen
@@ -321,6 +325,7 @@ if (optionalPackingItem.isPresent()) {
 }
 ```
 ### Bestellung auf IN_DELIVERY setzen wenn alle Packlistenitems gepackt sind
+![Alt text](pics/Screenshot%202023-05-24%20101310.png)
 ```java
 //Event OrderPackedEvent wurde veröffentlicht und triggert nun diesen Methodenaufruf
 @Transactional
@@ -351,17 +356,280 @@ public void handle(OrderPackedEvent orderPackedEvent) {
 ```
 
 ### Wo findet man DDD-Bestandteile?
-in Ordermanagement
-Value Objects:
-Aggregates:
-Repositories:
-Events zwischen Aggregate:
+in Ordermanagement sind
+#### Value Objects
+![Alt text](pics/valueobjects.png)
+```java
+//Beispiel Amount
+@ValueObjectMarker
+public record Amount(int amount) {
+    public Amount {
+        if (!isValid(amount)) throw new IllegalArgumentException("Amount must not be positive integer!");
+    }
+
+    public static boolean isValid(int amount) {
+        return amount >= 0;
+    }
+}
+```
+##### Aggregates
+```java
+@AggregateMarker
+public final class Order {
+
+    //ID
+    private final OrderID orderID;
+
+    //Customer-Data
+    private CustomerData customerData;
+
+    //Line-Items
+    private final List<LineItem> lineItems;
+
+    //Order-State and calcuated values
+    private OrderState state;
+    private final MonetaryAmount taxTotal;
+    private final MonetaryAmount netTotal;
+    private final MonetaryAmount grossTotal;
+    private final LocalDateTime date;
+
+    public Order(OrderID orderID, CustomerData customerData,
+                 LocalDateTime date, List<LineItem> lineItems, OrderState status) {
+        if (orderID == null) throw new IllegalArgumentException("OrderID must not be null!");
+        this.orderID = orderID;
+        if (customerData == null)
+            throw new IllegalArgumentException("Customer-Data for order invalid!");
+        this.customerData = customerData;
+        if (lineItems == null)
+            throw new IllegalArgumentException("LineItems-List must not be null, at least an empy List is needed!");
+        this.lineItems = lineItems;
+        if (status == null) throw new IllegalArgumentException("State must not be null!");
+        this.state = status;
+        this.taxTotal = this.calculateOrderTax();
+        this.netTotal = this.calculateOrderNetTotal();
+        this.grossTotal = this.calculateOrderGrossTotal();
+        this.date = date;
+    }
+
+    public List<LineItem> getLineItems() {
+        return Collections.unmodifiableList(this.lineItems);
+    }
+
+    public void orderStateTransitionTo(OrderState newState) {
+        switch (newState) {
+            case CANCELED -> {
+                if (this.state == OrderState.IN_DELIVERY || this.state == OrderState.DELIVERED)
+                    throw new OrderStateChangeNotPossibleException("Order in State " + this.state + " cannot be canceled");
+                this.state = newState;
+            }
+            case PAYMENT_VERIFIED -> {
+                if (this.state != OrderState.PLACED)
+                    throw new OrderStateChangeNotPossibleException("Order must be in state PLACED for transition to PAYMENT VERIFIED!");
+                this.state = newState;
+            }
+            case PREPARING_FOR_DELIVERY -> {
+                if (this.state != OrderState.PAYMENT_VERIFIED)
+                    throw new OrderStateChangeNotPossibleException("Order must be in state PAYMENT VERIFED for transition to PREPARING FOR DELIVERY!");
+                this.state = newState;
+            }
+            case IN_DELIVERY -> {
+                if (this.state != OrderState.PREPARING_FOR_DELIVERY)
+                    throw new OrderStateChangeNotPossibleException("Order must be in state PREPARING FOR DELIVERY for transition to IN DELIVERY!");
+                this.state = newState;
+            }
+            case DELIVERED -> {
+                if (this.state != OrderState.IN_DELIVERY)
+                    throw new OrderStateChangeNotPossibleException("Order must be in state IN DELIVERY for transition to DELIVERED!");
+                this.state = newState;
+            }
+        }
+    }
+    /**Code ausgelassen**/
+
+}
+```
+#### Repositories
+```java
+@RepositoryMarker
+@Repository
+class OrderRepositoryImpl implements OrderRepository {
+
+    @Autowired
+    private OrderJPARepository orderJPARepository;
+
+    @Override
+    public Optional<Order> insert(Order order) {
+        if (order == null) throw new IllegalArgumentException("Order to be inserted must not be null!");
+        OrderDbEntity orderDbEntity = DbOrderMapperService.toOrm(order);
+        OrderDbEntity insertedEntity = orderJPARepository.save(orderDbEntity);
+        if (insertedEntity == null) return Optional.empty();
+        return Optional.of(DbOrderMapperService.toDomain(insertedEntity));
+    }
+
+    @Override
+    public Optional<Order> getById(OrderID id) {
+        if (id == null) throw new IllegalArgumentException("OrderID for Order to get from db must not be null!");
+        Optional<OrderDbEntity> orderEntityOptional = this.orderJPARepository.findById(id.id());
+        if (!orderEntityOptional.isPresent()) return Optional.empty();
+        return Optional.of(DbOrderMapperService.toDomain(orderEntityOptional.get()));
+    }
+
+    @Override
+    public List<Order> getAll() {
+        List<OrderDbEntity> list = this.orderJPARepository.findAll();
+        if (list == null) return Collections.emptyList();
+        return list.stream().map(dbEntity -> DbOrderMapperService.toDomain(dbEntity)).toList();
+    }
+
+
+    @Override
+    public void deleteById(OrderID id) {
+        this.orderJPARepository.deleteById(id.id());
+    }
+
+    /**Code ausgelassen**/
+}
+```
+#### Events zwischen Aggregate
+![Alt text](pics/events.png)
+```java
+@Service
+@AllArgsConstructor
+class IncomingOrderPackedSpringEventHandler implements ApplicationListener<OrderPackedSpringEvent> {
+
+    private OrderIncomingMessagesPort orderIncomingMessagesPort;
+
+    @Override
+    @Async("threadPoolTaskExecutor")
+    public void onApplicationEvent(OrderPackedSpringEvent event) {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Order packed event received for order# " + event.getOrderID());
+        this.orderIncomingMessagesPort.handle(new OrderPackedEvent(new OrderID(event.getOrderID())));
+    }
+}
+```
 ### Wo findet man Ports-Und-Adapters-Architektur?
+![Alt text](pics/ports1.png)
+- die Ports sind die Interfaces
+- die Adapter sind die zugehörigen Implementierungen
+- es gibt mehrere Schichten: Domäne, Service, Infrastructure
+- wenn sich die Technologie bei einem Adapter verändert, hat dies keine Auswirkungen auf das restliche System; diese Änderung kann einfach implementiert werden
+
+### C4 Diagramm
+Context
+```mermaid
+C4Context
+    Person(user, "Benutzer", "Der Benutzer, der Kunde des System ist ")
+    System(erp, "ERP System", "Ermöglicht es Benutzer, Bestellungen aufzugeben und diese anzuzeigen")
+    Rel(user, erp, "Uses")
+    UpdateLayoutConfig($c4ShapeInRow="1", $c4BoundaryInRow="1")
+```
+Container
+```mermaid
+C4Container
+    Person(user, "Benutzer", "Der Benutzer, der Kunde des System ist ")
+    Container_Boundary(c1, "ERP") {
+        Container(restapi1, "REST API Order", "Java, Spring", "Funktionen für Ordermanagement")
+        Container(restapi2, "REST API Stock", "Java, Spring", "Funktionen für Stockmanagement")
+        Container(restapi3, "REST API Customer", "Java, Spring", "Funktionen für Customermanagement")
+        ContainerDb(database, "Database", "H2 In Memory", "Speichert Customer, Orders und Stock")
+        Container(sharedkernel, "Shared Kernel", "Java, Spring", "Verbindet die einzelnen Module über Events")
+
+    }
+
+    BiRel(database, restapi1, "Uses")
+    BiRel(database, restapi2, "Uses")
+    BiRel(database, restapi3, "Uses")
+    Rel(restapi1, sharedkernel, "Uses")
+    Rel(restapi2, sharedkernel, "Uses")
+    Rel(restapi3, sharedkernel, "Uses")
+    BiRel(user,restapi1, "")
+    BiRel(user,restapi2,  "")
+    BiRel(user,restapi3,  "")
+    UpdateLayoutConfig($c4ShapeInRow="3", $c4BoundaryInRow="1")
+```
+Component - Ordermanagement
+```mermaid
+C4Component
+    Container_Boundary(c1, "REST API Order") {
+        Component(restapi1, "Order REST Controller", "Java, Spring", "Controller für Ordermanagement")
+        Component(restapi2, "Exception REST Controller", "Java, Spring", "Controller für Exception")
+    }
+    Container(sharedkernel, "Shared Kernel", "Java, Spring", "Verbindet die einzelnen Module über Events")
+    Container(services, "Services", "Java, Spring", "Services für Ports&Adapters Realisierung")
+    ContainerDb(database, "Database", "H2 In Memory", "Speichert Customer, Orders und Stock")
+
+    BiRel(database, services, "Uses")
+    BiRel(services, restapi1, "Uses")
+    BiRel(services, sharedkernel, "Events abwickeln")
+    Rel(restapi1, restapi2, "")
+    UpdateLayoutConfig($c4ShapeInRow="3", $c4BoundaryInRow="1")
+```
+Die Code Ebene ist oben genauer mit Codebeispielen beschrieben und als Klassendiagramm verfügbar.
 
 ## Dokumentation (texthelle Beschreibung, Codeauszüge, Diagramme, C4-Diagramme, Klassendiagramme) der "Architektur" von Stockmanagement anhand der gegebenen Anwendungsfälle, die schon implementiert sind:
-### Packingliste anlegen
-### Packingitems als verpackt markieren
+- Packingliste anlegen
+- Packingitems als verpackt markieren
 
+Ist eine Art der 3-Schichten-Architektur mit Events und Ports
+- Rest Controller verwendet direkt Repository (package db) über Port
+- Rest Controller published Events
+- diese Events werden von den Listeners dann aufgefangen und verarbeitet
+- in package business liegen die Entitäten ohne Businesslogik
+- nur über die Events sind die verschiedenen Managements verbunden und über den sharedkernel (dort ist alles enthalten, damit die Kommunikation erfolgreich ist)
+![Alt text](pics/stockmanagement.png)
+
+### C4 Diagramm
+Context
+```mermaid
+C4Context
+    Person(user, "Benutzer", "Der Benutzer, der Kunde des System ist ")
+    System(erp, "ERP System", "Ermöglicht es Benutzer, Bestellungen aufzugeben und diese anzuzeigen")
+    Rel(user, erp, "Uses")
+    UpdateLayoutConfig($c4ShapeInRow="1", $c4BoundaryInRow="1")
+```
+Container
+```mermaid
+C4Container
+    Person(user, "Benutzer", "Der Benutzer, der Kunde des System ist ")
+    Container_Boundary(c1, "ERP") {
+        Container(restapi1, "REST API Order", "Java, Spring", "Funktionen für Ordermanagement")
+        Container(restapi2, "REST API Stock", "Java, Spring", "Funktionen für Stockmanagement")
+        Container(restapi3, "REST API Customer", "Java, Spring", "Funktionen für Customermanagement")
+        ContainerDb(database, "Database", "H2 In Memory", "Speichert Customer, Orders und Stock")
+        Container(sharedkernel, "Shared Kernel", "Java, Spring", "Verbindet die einzelnen Module über Events")
+
+    }
+
+    BiRel(database, restapi1, "Uses")
+    BiRel(database, restapi2, "Uses")
+    BiRel(database, restapi3, "Uses")
+    Rel(restapi1, sharedkernel, "Uses")
+    Rel(restapi2, sharedkernel, "Uses")
+    Rel(restapi3, sharedkernel, "Uses")
+    BiRel(user,restapi1, "")
+    BiRel(user,restapi2,  "")
+    BiRel(user,restapi3,  "")
+    UpdateLayoutConfig($c4ShapeInRow="3", $c4BoundaryInRow="1")
+```
+Component - Stockmanagement
+```mermaid
+C4Component
+    Container_Boundary(c1, "REST API Stock") {
+        Component(publish, "StockMessagePublisher", "Java, Spring", "schickt Events")
+        Component(restapi1, "Stock REST Controller", "Java, Spring", "Controller für Ordermanagement")
+
+    }
+    Container(sharedkernel, "Shared Kernel", "Java, Spring", "Verbindet die einzelnen Module über Events")
+    Container(repo, "Repository", "Java, Spring", "Repository für DB Zugriff")
+    ContainerDb(database, "Database", "H2 In Memory", "Speichert Customer, Orders und Stock")
+
+    BiRel(database, repo, "Uses")
+    BiRel(repo, restapi1, "Uses")
+    BiRel(publish, sharedkernel, "Events abwickeln")
+    Rel(restapi1, publish, "Uses")
+    UpdateLayoutConfig($c4ShapeInRow="3", $c4BoundaryInRow="1")
+```
+![Alt text](pics/stockmanagement_classs.png)
 
 ### Teil 3
 Aufgabe Makroarchitektur Teil 3
