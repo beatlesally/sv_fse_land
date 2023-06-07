@@ -60,6 +60,7 @@ Laden Sie sich das gegebene Maven-Ausgangsprojekt („TDD Kino Demo“, siehe Mo
 - Gegebene Domänen-Klassen (Kinosaal, Ticket etc.)
 - Gegebene Start-Junit5-Tests in test /java/at.itkolleg/AppTest
 Starten Sie den Test AppTest über den grünen Pfeil und versichern Sie sich, dass alles korrekt läuft. Starten Sie auch die App (main-Methode).
+
 ![Alt text](pic/klassendiagramm.png)
 
 ## AUFGABE 3: EINARBEITUNG IN DEN GEGEBENEN CODE
