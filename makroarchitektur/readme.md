@@ -34,6 +34,10 @@
         Laut Dr. Carola Lilienthal ist der Modulith ein gut strukturierter Monolith. Man verfolgt mit dem Modulith hohe Kohäsion und geringe Kopplung.
         Ein gut strukturierter Modulith kann später einfach in Microservices umgemünzt werden, weil er bereits eigenständige Module enthält.
         ![Alt text](pics/lilienthal_microservices_6.jpg)
+![Alt text](pics/microservicesmodulithmonolith.png)
+        - Microservices - physikalisch und logisch getrennt
+        - Modulith - physikalisch ganz, logisch getrennt
+        - Monolith - physikalisch und logisch ganz
 
     - Wie funktioniert die Ports and Adapters Architektur?
 
@@ -634,9 +638,39 @@ C4Component
 ### Teil 3
 Aufgabe Makroarchitektur Teil 3
 
-    A) Inbetriebnahme der Microservice-Variante von erplite
-         als Schritt für Schritt-Anleitung mit Screenshots und Text zu dokumentieren
-    B) Abgabe einer Architekturanalyse des bestehenden erplitems-Backends
-        B1) Schriftliche Dokumentation der Architektur als C4-Containerdiagramm und C4-Componentendiagramm incl. textuellen Beschreibungen, Codeauszügen und Screenshots.
-        B2) Die beschriebenen Use-Cases (Bestellung anlegen, Payment verifizieren, Packlistenitems abhaken) entlang der Architektur beschreiben, Codeauszüge zeigen, Screenshots mit den Resultaten zeigen, textuelle Beschreibungen dazu
-erplitewithmicroservice-main-4
+A) Inbetriebnahme der Microservice-Variante von erplite als Schritt für Schritt-Anleitung mit Screenshots und Text zu dokumentieren
+add maven project in maven reiter
+vscode -> frontend öffnen, readme, dockercompose (complex - adminer+phpmyadmin, simple - adminer)
+
+start mit servicediscovery - hängen sich mit ip und port ein, damit kommunikation funkt
+orderservice, delivery, stock, apigateway
+use services anhaken
+frontend mit go live server starten (muss unter port 5500 anfragen, weil sonst rückantwort nicht gegeben)
+rabbitmq login guest guest
+
+servicediscovery - dns
+unterschiedliche architekturen bei order,stock,delivery
+command, event = dto
+
+#### 1 alle Services einbinden
+![Alt text](pics/teil3/Screenshot%202023-05-31%20102045.png)
+
+#### 2 IP Adresse anpassen (wenn nötig)
+Da die Dockerinstanz auf einer virtuellen Maschine läuft, muss die IP-Adresse angepasst werden (statt localhost); 
+das muss in jeder application.properties (delivery,order,stock) durchgeführt werden
+![Alt text](pics/teil3/Screenshot%202023-05-31%20102307.png)
+
+#### 3 Docker-Compose hochfahren
+alle Container mit der Docker Compose hochfahren; Images werden gepulled wenn noch nicht verfügbar
+![Alt text](pics/teil3/Screenshot%202023-05-31%20102629.png)
+![Alt text](pics/teil3/Screenshot%202023-05-31%20103441.png)
+#### 4 Services hochfahren
+Reihenfolge: Service Discovery, Order, Stock, Delivery, ApiGateway
+![Alt text](pics/teil3/Screenshot%202023-05-31%20104218.png)
+#### Frontend hochfahren
+Frontend mit Go Live Server starten, da nur Zugriff über Port 5500 erlaubt
+![Alt text](pics/teil3/Screenshot%202023-05-31%20104255.png)
+![Alt text](pics/teil3/Screenshot%202023-05-31%20104431.png)
+B) Abgabe einer Architekturanalyse des bestehenden erplitems-Backends
+    B1) Schriftliche Dokumentation der Architektur als C4-Containerdiagramm und C4-Componentendiagramm incl. textuellen Beschreibungen, Codeauszügen und Screenshots.
+    B2) Die beschriebenen Use-Cases (Bestellung anlegen, Payment verifizieren, Packlistenitems abhaken) entlang der Architektur beschreiben, Codeauszüge zeigen, Screenshots mit den Resultaten zeigen, textuelle Beschreibungen dazu
