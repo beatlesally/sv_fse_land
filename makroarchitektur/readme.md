@@ -683,6 +683,42 @@ B) Abgabe einer Architekturanalyse des bestehenden erplitems-Backends
     
 B1) Schriftliche Dokumentation der Architektur als C4-Containerdiagramm und C4-Componentendiagramm incl. textuellen Beschreibungen, Codeauszügen und Screenshots.
 
+### Kurz und Knapp: 
+
+Der OrderMS baut auf der Ports and Adapters Struktur auf. Gehen wird davon das, dass eine neue Order erstellt wird. Dabei geht ein Post-Request an den Rest-Controller ein und die entsprechende Funktion mit dem richtigen Mapping kümmert sich darum. Diese empfängt als Parameter eine PlaceOrderCommand. Der Body wird automatisch von Spring in ein solches PlaceOrderCommand gemappt. 
+
+![Alt text](pics/teil3/orderrest.png)
+
+Das PlaceOrderCommand beinhaltet Datenfelder wie die Order-Domäne, jedoch sind alle als Typ String um eine geringe Kopplung zu erzielen. Außerdem enthält dieser Command nur die Datenfelder, die nicht automatisch vom System generiert werden.
+
+![Alt text](pics/teil3/orderplacedcommand.png)
+
+Ein Beispiel beim PlaceOrderCommand ist die OrderID, diese ist nicht enthalten, da sie beim Handling dieses Commands im OrderCommandService generiert wird. Dieser PlaceOrderCommand sowie andere Commands werden in OrderCommandService handelt. Die handle-Methode wird überladen, indem sie Parameter von verschiedenen Commands enthält. Somit weiß man, auf welchen Command reagiert wird, da die verschiedenen Commands verschiedene Zwecke erfüllen. 
+
+![Alt text](pics/teil3/ordercommandservice.png)
+
+Der OrderCommandService verwendet den Port OrderOutgoingMessageRelay und das OrderRepository. 
+
+![Alt text](pics/teil3/orderplacedcommand2.png)
+
+Somit ist klar, dass man sich mit dem OrderCommandService im Servicelayer befindet und dieser über die Ports die Datenbank und das RabbitMQ Messaging verwendet. Nachdem aus dem PlaceOrderCommand ein Order-Objekt erstellt wurde, wird es über das Repository in die Datenbank geschrieben. Weiters wird ein Event veröffentlicht. 
+
+![Alt text](pics/teil3/repositorypublish.png)
+
+Für dieses ist beim Message Broker eine bestimmte Queue hinterlegt.
+
+![Alt text](pics/teil3/messageoutgoing.png)
+
+Als Message wird aus dem Order-Objekt ein OrderResponse-Objekt (ist ein DTO => somit keine Abhängigkeiten) gemappt. Ein OrderResponse kann man sich wie Command vorstellen. Zur besseren Orientierung und das wenig Missverständnisse auftauchen, wird zwischen Response und Command unterschieden. 
+
+![Alt text](pics/teil3/orderresponse.png)
+
+Sollte ein andere Microservice dieses Event abonniert haben, wird dieses im IncomingMessageRelay das neue Event erkennen und handeln. Es wird mit den Parameter die verschiedenen Events unterschieden dadurch die richtige Funktion ausgeführt, wenn auf eine Queue gehört wird wo mehrere verschiedene Events veröffentlicht werden. 
+
+![Alt text](pics/teil3/incoming.png)
+
+Diese beschriebene Vorgehensweise kann auf alle anderen Use-Cases angeführt werden, vielleicht in anderer Reihenfolge.
+
 ```mermaid
 C4Container
     title Container Diagramm für ERPLite Microservices
@@ -718,6 +754,9 @@ C4Container
 
     UpdateLayoutConfig($c4ShapeInRow="3", $c4BoundaryInRow="1")
 ```
+
+Im Container Diagramm wird sehr schnell ersichtlich, wie die Microservices aufgebaut sind. Es sind getrennte Systeme, die nur über einen Messenger (RabbitMQ) miteinander kommunizieren bzw. Event veröffentlichen oder konsumieren. Wenn ein Microservice ein Objekt von einem anderen Microservice benötigen, werden sie nicht als ursprüngliches Objekt übermittelt, sondern als unabhängiges Command. Somit werden ungewünschte .
+
 ```mermaid
 C4Component
     title Componentendiagramm Order
@@ -744,8 +783,11 @@ B2) Die beschriebenen Use-Cases (Bestellung anlegen, Payment verifizieren, Packl
 #### Bestellung anlegen
 ![Alt text](pics/teil3/Screenshot%202023-06-11%20213153.png)
 ![Alt text](pics/teil3/Screenshot%202023-06-11%20213608.png)
+
 Als erstes wird mit einem POST Request auf api/v1/orders gemacht. Diese Anfrage geht an den ApiGateway. Dieser hat Routen definiert, die zu einer bestimmten URI führen. Somit kann man mit Namen anfragen und nicht mit einer IP. Die Route geht in diesem Fall auf den Microservice Orders. 
+
 ![Alt text](pics/teil3/Screenshot%202023-06-11%20215337.png)
+
 Im Body werden Dummydaten übergeben.
 Danach wird die Funktion getallorders aufgerufen.
 ```javascript
@@ -789,6 +831,7 @@ async function putorder()
     getallorders();
 }
 ```
+
 Im OrderRestController springt das Post-Mapping an. 
 
 ```java
@@ -829,9 +872,11 @@ public record PlaceOrderCommand(
         @NotNull @Size(min = 1, message = "Customer country must not be null and must have at least 1 Character!") String customerCountry,
         @Valid @NotNull List<CartItem> cartItems) { //Valdation cascading for Javax-Validation with @Valid
 ```
+
 Der Body wird als PlacedOrderCommand gemappt, das im Shared Kernel definiert ist. Damit zwischen den Services keine Abhängigkeiten entstehen.
 
 Über das ordercommandservice handelt die verschiedenen Commands die im Zusammenhang mit Order auftreten können. Das ordercommandservice verwendet orderrepository und das orderoutgoingmessagerelay.
+
 ```java
 @Transactional
     public OrderResponse handle(PlaceOrderCommand placeOrderCommand) {
