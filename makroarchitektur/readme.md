@@ -755,7 +755,7 @@ C4Container
     UpdateLayoutConfig($c4ShapeInRow="3", $c4BoundaryInRow="1")
 ```
 
-Im Container Diagramm wird sehr schnell ersichtlich, wie die Microservices aufgebaut sind. Es sind getrennte Systeme, die nur über einen Messenger (RabbitMQ) miteinander kommunizieren bzw. Event veröffentlichen oder konsumieren. Wenn ein Microservice ein Objekt von einem anderen Microservice benötigen, werden sie nicht als ursprüngliches Objekt übermittelt, sondern als unabhängiges Command. Somit werden ungewünschte .
+Im Container Diagramm wird sehr schnell ersichtlich, wie die Microservices aufgebaut sind. Es sind getrennte Systeme, die nur über einen Messenger (RabbitMQ) miteinander kommunizieren bzw. Event veröffentlichen oder konsumieren. 
 
 ```mermaid
 C4Component
