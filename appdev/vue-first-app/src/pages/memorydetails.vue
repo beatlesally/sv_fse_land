@@ -1,21 +1,27 @@
 <template>
   <base-layout
-v-if="loadedMemory"
+    v-if="loadedMemory"
     :page-title="loadedMemory.title"
-    page-default-back-link="/memories"  >
+    page-default-back-link="/memories"
+  >
     <h2 v-if="!loadedMemory">Could not find a memory for given id</h2>
-    <h2 v-else>Loaded</h2>
+    <memory-overview
+      v-else
+      :title="loadedMemory.title"
+      :image="loadedMemory.image"
+      :description="loadedMemory.description"
+    >
+    </memory-overview>
   </base-layout>
 </template>
 
 <script>
 import { defineComponent } from "vue";
-import { IonList, IonItem } from "@ionic/vue";
+import MemoryOverview from "../components/memories/MemoryOverview.vue";
 
 export default defineComponent({
   components: {
-    IonList,
-    IonItem,
+    MemoryOverview,
   },
   data() {
     return {
