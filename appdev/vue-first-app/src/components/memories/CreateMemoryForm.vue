@@ -7,7 +7,7 @@
       </ion-item>
       <ion-item>
         <ion-thumbnail slot="start">
-          <img :src="previewImageUrl" />
+          <img :src="takenImageUrl" />
         </ion-thumbnail>
         <ion-button type="button" fill="clear" @click="takePhoto()">
           <ion-icon :icon="camera" slot="start"></ion-icon>
@@ -50,10 +50,9 @@ export default {
   data() {
     return {
         enteredTitle: '',
-        enteredImageUrl: '',
         enteredDescription: '',
         camera,
-        previewImageUrl: null
+        takenImageUrl: null
     }
   },
   methods: {
@@ -64,13 +63,13 @@ export default {
         quality: 60
       });
 
-      this.previewImageUrl = image.webPath;
+      this.takenImageUrl = image.webPath;
       
     },
     submitForm() {
         const memoryData = {
             title: this.enteredTitle,
-            imageUrl: this.enteredImageUrl,
+            imageUrl: this.takenImageUrl,
             description: this.enteredDescription
         };
         this.$emit('save-memory', memoryData);
