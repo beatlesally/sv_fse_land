@@ -1,9 +1,8 @@
 {
   "appId": "lab.sally.firstmemories",
   "appName": "First Memories",
-  "bundledWebRuntime": false,
   "npmClient": "npm",
-  "webDir": "public",
+  "webDir": "dist",
   "plugins": {
     "SplashScreen": {
       "launchShowDuration": 0
